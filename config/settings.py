@@ -126,6 +126,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Оставляем стандартный backend для других случаев
-    'booking.authentication.EmailAuthBackend',     # Добавляем наш backend для авторизации по email
+    'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд, оставляем для поддержки других методов
+    'booking.backends.EmailBackend',  # наш кастомный бэкенд аутентификации
 ]
+
+LOGIN_URL = 'login'  # URL для перенаправления на страницу входа
+LOGOUT_REDIRECT_URL = 'login'  # URL для перенаправления после выхода
