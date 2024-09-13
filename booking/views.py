@@ -4,7 +4,7 @@ from booking.serializers import *
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .forms import LoginForm
+from .forms import LoginForm, HousingForm
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.contrib import messages
@@ -69,3 +69,30 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Вы успешно вышли из системы.')
     return redirect('login')  # Перенаправление на страницу логина или другую нужную страницу
+
+
+def index(request):
+    housing = Housing.objects.order_by('-id')
+    return render(request, 'booking/index.html', {'title': 'Main page', 'housing': housing})
+
+
+def about(request):
+    return render(request, 'booking/about.html')
+
+
+def create(request):
+    error = ''
+    if request.method == 'POST':
+        form = HousingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+        else:
+            error = 'Неверные данные'
+
+    form = HousingForm()
+    context = {
+        'form': form,
+        'errors': error
+    }
+    return render(request, 'booking/create.html', context)
