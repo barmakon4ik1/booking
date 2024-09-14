@@ -24,10 +24,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    booking_user = UserSerializer(read_only=True)
-    booking_object = HousingSerializer(read_only=True)
-    booking_review = ReviewSerializer(read_only=True)
-
     class Meta:
         model = Booking
         fields = '__all__'
+        read_only_fields = ['user']
+

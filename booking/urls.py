@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 
 router = DefaultRouter()
 router.register('housings', HousingViewSet, basename='housings')
-router.register('bookings', BookingViewSet, basename='bookings')
+router.register('booking', BookingViewSet, basename='booking')
 router.register('reviews', ReviewViewSet, basename='reviews')
 router.register('users', UserViewSet, basename='users')
 

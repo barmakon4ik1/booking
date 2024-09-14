@@ -1,20 +1,29 @@
+from django.views.generic import DetailView
 from rest_framework import viewsets
-from booking.models import *
 from booking.serializers import *
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .forms import LoginForm, HousingForm, UserRegistrationForm
+from .filters import *
+from .forms import *
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from .permissions import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from .models import *
 
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -33,6 +42,10 @@ class HousingViewSet(viewsets.ModelViewSet):
     queryset = Housing.objects.all()
     serializer_class = HousingSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = HousingFilter
+    ordering_fields = '__all__'  # Позволяет сортировать по всем полям модели
+    ordering = ['-created_at']  # Сортировка по умолчанию
 
     def perform_create(self, serializer):
         """
@@ -83,15 +96,24 @@ def logout_view(request):
 
 
 def index(request):
+    """
+    Главная страница сайта
+    """
     housing = Housing.objects.order_by('-id')
-    return render(request, 'booking/index.html', {'title': 'Main page', 'housing': housing})
+    return render(request, 'booking/index.html', {'title': 'AT-Booking Просмотр объектов', 'housing': housing})
 
 
 def about(request):
+    """
+    Страница о программе и ее назначении
+    """
     return render(request, 'booking/about.html')
 
 
 def create(request):
+    """
+    Регистрация объекта недвижимости
+    """
     error = ''
     if request.method == 'POST':
         form = HousingForm(request.POST)
@@ -110,6 +132,9 @@ def create(request):
 
 
 def register(request):
+    """
+    Функция регистрации пользователей
+    """
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():

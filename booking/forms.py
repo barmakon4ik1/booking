@@ -1,5 +1,5 @@
 from django import forms
-from .models import Housing
+from .models import *
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -72,25 +72,4 @@ class UserRegistrationForm(UserCreationForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
-        # widgets = {
-        #     'username': forms.TextInput(attrs={
-        #         'class': 'form-control',
-        #         'placeholder': 'Введите Ваш логин'
-        #     }),
-        #     'first_name': forms.TextInput(attrs={
-        #         'class': 'form-control',
-        #         'placeholder': 'Введите Ваше имя'
-        #     }),
-        #     'last_name': forms.TextInput(attrs={
-        #         'class': 'form-control',
-        #         'placeholder': 'Введите Вашу фамилию'
-        #     }),
-        #     'password1': forms.PasswordInput(attrs={
-        #         'class': 'form-control',
-        #         'placeholder': 'Введите пароль'
-        #     }),
-        #     'password2': forms.PasswordInput(attrs={
-        #         'class': 'form-control',
-        #         'placeholder': 'Повторите пароль'
-        #     }),
-        # }
+
