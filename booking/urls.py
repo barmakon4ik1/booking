@@ -15,7 +15,7 @@ urlpatterns = [
     path('create', create, name='create'),
 
 
-    path('login/', login_view, name='login'),
+    path('login', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('api/', include(router.urls)),
 ]
