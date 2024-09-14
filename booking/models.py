@@ -21,7 +21,7 @@ class Housing(models.Model):
     rooms = models.IntegerField(_('Number of rooms'))
     description = models.TextField(_('Description'))
     price = models.DecimalField(_('Price'), max_digits=10, decimal_places=2)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_housings')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_housings')
     is_visible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

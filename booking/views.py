@@ -4,10 +4,12 @@ from booking.serializers import *
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .forms import LoginForm, HousingForm
+from .forms import LoginForm, HousingForm, UserRegistrationForm
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.contrib import messages
+from .permissions import *
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -21,19 +23,28 @@ class BookingViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
 
 
 class HousingViewSet(viewsets.ModelViewSet):
+    """
+    Эндпоинт просмотра объектов найма и редактирования
+    """
     queryset = Housing.objects.all()
     serializer_class = HousingSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
     def perform_create(self, serializer):
+        """
+        Устанавливает текущего пользователя как владельца
+        """
         serializer.save(owner=self.request.user)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
 
 def login_view(request):
@@ -93,6 +104,21 @@ def create(request):
     form = HousingForm()
     context = {
         'form': form,
-        'errors': error
+        'error': error
     }
     return render(request, 'booking/create.html', context)
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.first_name = form.cleaned_data.get('first_name')
+            user.last_name = form.cleaned_data.get('last_name')
+            user.save()
+            return redirect('login')  # Редирект на страницу входа после успешной регистрации
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'booking/register.html', {'form': form})
+

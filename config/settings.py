@@ -146,8 +146,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд, оставляем для поддержки других методов
-    'booking.backends.EmailBackend',  # наш кастомный бэкенд аутентификации
 ]
 
 LOGIN_URL = 'login'  # URL для перенаправления на страницу входа
-LOGOUT_REDIRECT_URL = 'login'  # URL для перенаправления после выхода
+LOGIN_REDIRECT_URL = '/'  # На какую страницу перенаправить после входа
+LOGOUT_REDIRECT_URL = '/'  # URL для перенаправления после выхода
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@example.com'
+EMAIL_HOST_PASSWORD = 'your-email-password'
+DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+

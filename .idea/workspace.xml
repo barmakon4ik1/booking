@@ -5,15 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c298cef4-d3ea-4fbd-bf21-2f4ad1736bd5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/booking/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/about.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/create.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/booking/templates/booking/register.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/booking/Otkat/otkat_login.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/booking/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/booking/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/booking/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/booking/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/booking/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/booking/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/booking/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/booking/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/booking/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/booking/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/booking/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/booking/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/booking/Otkat/otkat_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/booking/about.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/booking/base.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/booking/create.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/booking/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/booking/login.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/logout.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,8 +38,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -72,6 +84,13 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\booking\booking" />
+      <recent name="E:\booking\templates" />
+      <recent name="E:\booking\booking\Otkat" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="booking" type="Python.DjangoServer" factoryName="Django server">
       <module name="booking" />
@@ -130,7 +149,7 @@
       <workItem from="1726251342206" duration="492000" />
       <workItem from="1726251869989" duration="10228000" />
       <workItem from="1726297446154" duration="56000" />
-      <workItem from="1726297741422" duration="3065000" />
+      <workItem from="1726297741422" duration="16682000" />
     </task>
     <servers />
   </component>
