@@ -77,6 +77,10 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ['date_from', 'date_to'] # Поля, заполняемые пользователем
+        widgets = {
+            'date_from': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_to': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -87,4 +91,44 @@ class BookingForm(forms.ModelForm):
         if date_from and date_to and date_from > date_to:
             raise forms.ValidationError("Дата начала бронирования не может быть позже даты окончания.")
 
+        return cleaned_data
+
+
+class CancelBookingForm(forms.ModelForm):
+    """
+    Форма отмены бронирования
+    """
+    class Meta:
+        model = Booking
+        fields = [] # Не отображаем поле status как обязательное
+
+    def save(self, commit=True):
+        # Устанавливаем статус бронирования как 'CANCELED'
+        booking = super().save(commit=False)
+        booking.status = Booking.BookingStatus.CANCELED
+        if commit:
+            booking.save()
+        return booking
+
+
+class EditBookingForm(forms.ModelForm):
+    """
+    Форма редактирования бронирования
+    """
+    class Meta:
+        model = Booking
+        fields = ['date_from', 'date_to']  # Добавляем поля для редактирования дат
+        widgets = {
+            'date_from': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_to': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_from = cleaned_data.get('date_from')
+        date_to = cleaned_data.get('date_to')
+
+        # Проверка на корректность дат
+        if date_from and date_to and date_from > date_to:
+            raise forms.ValidationError("Дата начала не может быть позже даты окончания.")
         return cleaned_data

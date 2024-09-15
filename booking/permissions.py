@@ -34,5 +34,5 @@ class IsOwnerOrAdmin(BasePermission):
             return True
 
         # Разрешаем доступ, если пользователь - владелец объекта
-        return obj.owner == request.user
+        return obj.user == request.user
 

@@ -237,7 +237,7 @@ def create_booking(request, housing_id):
             booking.status = Booking.BookingStatus.UNCONFIRMED # Устанавливаем статус
             booking.save()
             messages.success(request, 'Бронирование успешно создано и ожидает подтверждения!')
-            return redirect('housing_list')  # Перенаправляем на главную или на страницу с объектом
+            return redirect('my_bookings')  # Перенаправляем на страницу бронирования
     else:
         form = BookingForm()
 
@@ -247,3 +247,48 @@ def create_booking(request, housing_id):
     })
 
 
+@login_required
+def my_bookings(request):
+    """
+    Отображение всех бронирований пользователя
+    """
+    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'booking/my_bookings.html', {'bookings': bookings})
+
+
+@login_required
+def cancel_booking(request, booking_id):
+    """
+    Отмена бронирования
+    """
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+
+    if request.method == 'POST':
+        form = CancelBookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            return redirect('my_bookings')
+    else:
+        form = CancelBookingForm(instance=booking)
+
+    return render(request, 'booking/cancel_booking.html', {'form': form, 'booking': booking})
+
+
+@login_required
+def edit_booking(request, booking_id):
+    # Проверяем, что бронирование принадлежит пользователю
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+
+    if request.method == 'POST':
+        form = EditBookingForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            # Перенаправляем на страницу со списком бронирований после сохранения
+            return redirect('my_bookings')
+    else:
+        form = EditBookingForm(instance=booking)
+
+    return render(request, 'booking/edit_booking.html', {
+        'form': form,
+        'booking': booking
+    })

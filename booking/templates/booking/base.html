@@ -11,7 +11,7 @@
    <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
       <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
 
-          <h3> AT-Booking </h3>
+          <h4> AT-Booking </h4>
       </a>
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'index' %}">Главная</a>
@@ -26,6 +26,7 @@
                 Войти
                 </a>
             {% endif %}
+          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'my_bookings' %}">Мои бронирования</a>
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'about' %}">О программе</a>
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/admin/">Админ</a>
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/api/">API</a>

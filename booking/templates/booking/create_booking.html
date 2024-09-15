@@ -9,7 +9,7 @@
     <div class="alert alert-warning mt-2">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.as_p }}  <!-- Форматируем поля с виджетами выбора даты -->
 
             <button type="submit" class="btn btn-primary">Забронировать</button>
         </form>

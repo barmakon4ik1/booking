@@ -13,12 +13,13 @@ router.register('users', UserViewSet, basename='users')
 urlpatterns = [
     path('housing_list/', housing_list, name='housing_list'),
     path('booking/create/<int:housing_id>/', create_booking, name='create_booking'),
+    path('my_bookings/', my_bookings, name='my_bookings'),
+    path('cancel-booking/<int:booking_id>/', cancel_booking, name='cancel_booking'),
+    path('booking/edit/<int:booking_id>/', edit_booking, name='edit_booking'),
 
     path('', index, name='index'),
     path('about', about, name='about'),
     path('create/', create, name='create'),
-
-
 
     path('login', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
