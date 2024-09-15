@@ -1,0 +1,20 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    Начало работы
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-danger">Пожалуйста, войдите в систему</h1>
+        <div class="alert alert-danger mt-3">
+            <h4 class="alert-heading">Прежде, чем работать с программой, Вам нужно войти в систему!</h4>
+            <p>
+                Пожалуйста, введите свои данные, чтобы <a href="{% url 'login' %}">войти в систему</a>.
+            </p>
+            <hr>
+            <p class="mb-0">Вы также можете воспользоваться выбором пункта "Войти" в меню.</p>
+            <p class="mb-0">Если Вы еще не зарегистрированы, можете воспользоваться выбором пункта регистрация по ссылке выше.</p>
+        </div>
+    </div>
+{% endblock %}

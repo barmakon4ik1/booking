@@ -20,10 +20,25 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import *
 from django.views.generic import ListView
+from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
 
 def housing_list(request):
-    housing = Housing.objects.all()
+    """
+    Отображение формы с возможностью фильтрации
+    """
+    user = request.user
+
+    # Фильтрация объектов по is_visible
+    if user == 'owner' or user.is_superuser:
+        # Если пользователь администратор, возвращаем все объекты
+        housing = Housing.objects.all().order_by('-id')
+    else:
+        # Для обычных пользователей - только видимые объекты
+        housing = Housing.objects.filter(is_visible=True).order_by('id')
+
     housing_filter = HousingFilter(request.GET, queryset=housing)
 
     context = {
@@ -32,12 +47,6 @@ def housing_list(request):
         'title': 'Список жилья'
     }
     return render(request, 'booking/housing_list.html', context)
-
-
-# class HousingListView(FilterView):
-#     model = Housing
-#     filterset_class = HousingFilter
-#     template_name = 'booking/housing_list.html'
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -59,7 +68,6 @@ class HousingViewSet(viewsets.ModelViewSet):
     """
     Эндпоинт просмотра объектов найма и редактирования
     """
-    queryset = Housing.objects.all()
     serializer_class = HousingSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -69,9 +77,22 @@ class HousingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Получение данных с учетом фильтров
+        Получение данных с учетом фильтров и видимости, с учетом прав доступа
         """
-        queryset = Housing.objects.all()
+        user = self.request.user
+
+        if user.is_superuser:
+            # Если пользователь администратор, возвращаем все объекты
+            queryset = Housing.objects.all()
+        else:
+            # Для обычных пользователей - только видимые объекты
+            # queryset = Housing.objects.filter(is_visible=True)
+            queryset = Housing.objects.filter(
+                Q(is_visible=True) |
+                Q(owner=user)
+            ).order_by('-id')
+
+        # Применение фильтров
         filterset = self.filterset_class(self.request.GET, queryset=queryset)
         return filterset.qs
 
@@ -125,10 +146,31 @@ def logout_view(request):
 
 def index(request):
     """
-    Главная страница сайта
+    Начальная страница сайта
     """
-    housing = Housing.objects.order_by('-id')
-    return render(request, 'booking/index.html', {'title': 'AT-Booking Просмотр объектов', 'housing': housing})
+    try:
+        user = request.user
+        # Определяем фильтр для видимости
+        if user.is_staff or user.is_superuser:
+            # Если пользователь администратор, возвращаем все объекты
+            housing = Housing.objects.all().order_by('id')
+        else:
+            # Фильтруем объекты по видимости и добавляем объекты, где пользователь является владельцем
+            housing = Housing.objects.filter(
+                is_visible=True
+            ).order_by('-id')
+            housing = housing | Housing.objects.filter(owner=user)
+        return render(request, 'booking/index.html', {
+            'title': 'AT-Booking Просмотр объектов',
+            'housing': housing
+        })
+    except Exception as e:
+        # Логирование ошибки для отладки
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error occurred: {e}")
+        # Перенаправление на страницу с ошибкой или вывод сообщения об ошибке
+        return render(request, 'booking/error.html', {'error_message': str(e)})
 
 
 def about(request):
@@ -174,4 +216,3 @@ def register(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'booking/register.html', {'form': form})
-

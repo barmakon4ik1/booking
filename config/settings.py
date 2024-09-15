@@ -19,13 +19,6 @@ REST_FRAMEWORK = {
         # Размер страницы по умолчанию:
         'PAGE_SIZE': 1,
 
-    # # Simple JWT - тип аутентификации
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    #     'rest_framework.authentication.SessionAuthentication',
-    #     'rest_framework.authentication.BasicAuthentication',
-    #     ],
-
     # Разрешения доступа по умолчанию
     'DEFAULT_PERMISSION_CLASSES': [
         # по умолчанию разрешен просмотр для всех:

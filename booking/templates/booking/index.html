@@ -1,13 +1,11 @@
 {% extends 'booking/base.html' %}
-{% load form_tags %}
-
 
 {% block title %}
     {{ title }}
 {% endblock %}
 
 {% block content %}
-    <h1>Просмотр вариантов для найма жилой площади</h1>
+    <h2>На нашем сайте есть следующие варианты для найма:</h2>
 
     <!-- Список объектов жилья -->
     {% if housing %}
@@ -19,9 +17,9 @@
                  <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
                  <p>Число комнат: {{ el.rooms }}</p>
                  <p>Стоимость проживания за сутки: {{ el.price }},-€</p>
-
             </div>
         {% endfor %}
+
     {% else %}
         <div class="alert alert-warning mt-2">
             <p>Записей нет</p>

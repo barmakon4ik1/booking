@@ -70,10 +70,14 @@ class HousingFilter(FilterSet):
         label='Поиск по ключевым словам, Введите слово или его часть в названии объекта, описании, адреса или '
               'индекса населенного пункта: ',
     )
+    is_visible = BooleanFilter(
+        field_name='is_visible',
+        label="Показывать только видимые объекты"
+    )
 
     class Meta:
         model = Housing
-        fields = ['type', 'price_range', 'price_min', 'price_max', 'rooms', 'keyword']
+        fields = ['type', 'price_range', 'price_min', 'price_max', 'rooms', 'keyword', 'is_visible']
 
     def filter_by_keyword(self, queryset, name, value):
         """

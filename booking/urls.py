@@ -16,7 +16,7 @@ urlpatterns = [
 
     path('', index, name='index'),
     path('about', about, name='about'),
-    path('create', create, name='create'),
+    path('create/', create, name='create'),
 
 
     path('login', login_view, name='login'),
