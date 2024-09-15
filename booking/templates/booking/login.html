@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="alert alert-warning mt-2">
-        <h3>Вход в систему и выход из неё</h3><br>
+        <h3>Для работы с системой необходимо войти в неё</h3><br>
         
         {% if user.is_authenticated %}
             <p>Добро пожаловать, {{ user.username }}!</p>

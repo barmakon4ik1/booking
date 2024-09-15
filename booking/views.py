@@ -1,3 +1,5 @@
+import logging
+
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
@@ -25,28 +27,39 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 
 
+def user_filter(request):
+    user = request.user
+    # Определяем фильтр для видимости
+    if user.is_staff or user.is_superuser:
+        # Если пользователь администратор, возвращаем все объекты
+        return Housing.objects.all().order_by('id')
+    else:
+        # Фильтруем объекты по видимости и добавляем объекты, где пользователь является владельцем
+        housing = Housing.objects.filter(
+            is_visible=True
+        ).order_by('-id')
+        return housing | Housing.objects.filter(owner=user)
+
+
 def housing_list(request):
     """
-    Отображение формы с возможностью фильтрации
+    Отображение формы с возможностью фильтрации - меню "Фильтр"
     """
-    user = request.user
-
-    # Фильтрация объектов по is_visible
-    if user == 'owner' or user.is_superuser:
-        # Если пользователь администратор, возвращаем все объекты
-        housing = Housing.objects.all().order_by('-id')
-    else:
-        # Для обычных пользователей - только видимые объекты
-        housing = Housing.objects.filter(is_visible=True).order_by('id')
-
-    housing_filter = HousingFilter(request.GET, queryset=housing)
-
-    context = {
-        'filter': housing_filter,
-        'housing': housing_filter.qs,  # отфильтрованные результаты
-        'title': 'Список жилья'
-    }
-    return render(request, 'booking/housing_list.html', context)
+    try:
+        housing_filter = HousingFilter(request.GET, queryset=user_filter(request))
+        context = {
+            'filter': housing_filter,
+            'housing': housing_filter.qs,  # отфильтрованные результаты
+            'title': 'Список жилья'
+        }
+        return render(request, 'booking/housing_list.html', context)
+    except Exception as e:
+        # Логирование ошибки для отладки
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error occurred: {e}")
+        # Перенаправление на страницу с авторизацией
+        return render(request, 'booking/error.html', {'error_message': str(e)})
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -59,7 +72,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
 
@@ -146,36 +159,25 @@ def logout_view(request):
 
 def index(request):
     """
-    Начальная страница сайта
+    Начальная страница сайта - меню "Главная"
     """
     try:
-        user = request.user
-        # Определяем фильтр для видимости
-        if user.is_staff or user.is_superuser:
-            # Если пользователь администратор, возвращаем все объекты
-            housing = Housing.objects.all().order_by('id')
-        else:
-            # Фильтруем объекты по видимости и добавляем объекты, где пользователь является владельцем
-            housing = Housing.objects.filter(
-                is_visible=True
-            ).order_by('-id')
-            housing = housing | Housing.objects.filter(owner=user)
         return render(request, 'booking/index.html', {
             'title': 'AT-Booking Просмотр объектов',
-            'housing': housing
+            'housing': user_filter(request)
         })
     except Exception as e:
         # Логирование ошибки для отладки
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f"Error occurred: {e}")
-        # Перенаправление на страницу с ошибкой или вывод сообщения об ошибке
+        # Перенаправление на страницу с авторизацией
         return render(request, 'booking/error.html', {'error_message': str(e)})
 
 
 def about(request):
     """
-    Страница о программе и ее назначении
+    Страница о программе и ее назначении - меню "О программе"
     """
     return render(request, 'booking/about.html')
 
@@ -184,26 +186,36 @@ def create(request):
     """
     Регистрация объекта недвижимости
     """
-    error = ''
-    if request.method == 'POST':
-        form = HousingForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/')
-        else:
-            error = 'Неверные данные'
+    try:
+        user = request.user
+        if user.is_authenticated:
+            error = ''
+            if request.method == 'POST':
+                form = HousingForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    return redirect('/')
+                else:
+                    error = 'Неверные данные'
 
-    form = HousingForm()
-    context = {
-        'form': form,
-        'error': error
-    }
-    return render(request, 'booking/create.html', context)
+            form = HousingForm()
+            context = {
+                'form': form,
+                'error': error
+            }
+            return render(request, 'booking/create.html', context)
+        else:
+            return redirect('login')
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error occurred: {e}")
+        # Перенаправление на страницу с авторизацией
+        return render(request, 'booking/error.html', {'error_message': str(e)})
 
 
 def register(request):
     """
-    Функция регистрации пользователей
+    Функция регистрации пользователей - в меню "Войти" есть опция "Создать аккаунт"
     """
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -216,3 +228,6 @@ def register(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'booking/register.html', {'form': form})
+
+
+
