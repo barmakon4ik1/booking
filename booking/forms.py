@@ -132,3 +132,15 @@ class EditBookingForm(forms.ModelForm):
         if date_from and date_to and date_from > date_to:
             raise forms.ValidationError("Дата начала не может быть позже даты окончания.")
         return cleaned_data
+
+
+class ChangeBookingStatusForm(forms.ModelForm):
+    """
+    Подтверждение статуса бронирования
+    """
+    class Meta:
+        model = Booking
+        fields = ['status']  # Позволяем редактировать только статус
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'}),  # Добавляем класс для стилей
+        }

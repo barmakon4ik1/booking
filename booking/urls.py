@@ -16,6 +16,7 @@ urlpatterns = [
     path('my_bookings/', my_bookings, name='my_bookings'),
     path('cancel-booking/<int:booking_id>/', cancel_booking, name='cancel_booking'),
     path('booking/edit/<int:booking_id>/', edit_booking, name='edit_booking'),
+    path('booking/<int:booking_id>/change-status/', change_booking_status, name='change_booking_status'),
 
     path('', index, name='index'),
     path('about', about, name='about'),

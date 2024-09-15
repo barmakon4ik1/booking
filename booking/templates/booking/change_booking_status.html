@@ -1,0 +1,17 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    Изменение статуса бронирования
+{% endblock %}
+
+{% block content %}
+    <h2>Изменение статуса бронирования объекта: {{ booking.housing.name }}</h2>
+    <div class="alert alert-warning mt-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Обновить статус</button>
+        </form>
+    </div>
+    <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к деталям бронирования</a>
+{% endblock %}

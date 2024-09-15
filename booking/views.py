@@ -276,6 +276,9 @@ def cancel_booking(request, booking_id):
 
 @login_required
 def edit_booking(request, booking_id):
+    """
+    Редактирование бронирования
+    """
     # Проверяем, что бронирование принадлежит пользователю
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
@@ -292,3 +295,48 @@ def edit_booking(request, booking_id):
         'form': form,
         'booking': booking
     })
+
+
+@login_required
+def change_booking_status(request, booking_id):
+    """
+    Изменение статуса бронирования
+    """
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    # Проверяем, что пользователь является владельцем объекта или администратором
+    if request.user != booking.housing.owner and not request.user.is_staff:
+        messages.error(request, "У вас нет прав для изменения статуса этого бронирования.")
+        return redirect('my_bookings')
+
+    if request.method == 'POST':
+        form = ChangeBookingStatusForm(request.POST, instance=booking)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Статус бронирования успешно обновлен.")
+            # Перенаправляем на страницу со списком бронирований после изменения статуса бронирования
+            return redirect('my_bookings')
+    else:
+        form = ChangeBookingStatusForm(instance=booking)
+
+    return render(request, 'booking/change_booking_status.html', {
+        'form': form,
+        'booking': booking
+    })
+
+
+@login_required
+def pending_bookings(request):
+    user = request.user
+
+    # Если пользователь администратор, получаем все бронирования со статусом PENDING или UNCONFIRMED
+    if user.is_staff or user.is_superuser:
+        bookings_s = Booking.objects.filter(status__in=['PENDING', 'UNCONFIRMED']).order_by('-created_at')
+    else:
+        # Для владельца объекта получаем бронирования его объектов со статусом PENDING или UNCONFIRMED
+        bookings_s = Booking.objects.filter(
+            housing__owner=user, status__in=['PENDING', 'UNCONFIRMED']
+        ).order_by('-created_at')
+
+    return render(request, 'my_booking.html', {'bookings': bookings_s})
+
