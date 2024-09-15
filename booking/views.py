@@ -2,6 +2,8 @@ import logging
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+
 from booking.serializers import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
@@ -63,6 +65,28 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class BookingDetailListCreateView(ListCreateAPIView):
+    queryset = Booking.objects.all().order_by('id')
+    permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return BookingDetailSerializer
+        return BookingDetailCreateUpdateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class BookingDetailListRetrieveUpdateView(RetrieveUpdateAPIView):
+    queryset = Booking.objects.all().order_by('id')
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return BookingDetailSerializer
+        return BookingDetailCreateUpdateSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -331,12 +355,12 @@ def pending_bookings(request):
 
     # Если пользователь администратор, получаем все бронирования со статусом PENDING или UNCONFIRMED
     if user.is_staff or user.is_superuser:
-        bookings_s = Booking.objects.filter(status__in=['PENDING', 'UNCONFIRMED']).order_by('-created_at')
+        bookings_status = Booking.objects.filter(status__in=['PENDING', 'UNCONFIRMED']).order_by('-created_at')
     else:
         # Для владельца объекта получаем бронирования его объектов со статусом PENDING или UNCONFIRMED
-        bookings_s = Booking.objects.filter(
+        bookings_status = Booking.objects.filter(
             housing__owner=user, status__in=['PENDING', 'UNCONFIRMED']
         ).order_by('-created_at')
 
-    return render(request, 'my_booking.html', {'bookings': bookings_s})
+    return render(request, 'my_booking.html', {'bookings_status': bookings_status})
 

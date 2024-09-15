@@ -34,3 +34,17 @@ class BookingSerializer(serializers.ModelSerializer):
         read_only_fields = ('user',)
 
 
+class BookingDetailSerializer(BookingSerializer):
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
+
+class BookingDetailCreateUpdateSerializer(BookingSerializer):
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
+
+
+

@@ -17,6 +17,8 @@ urlpatterns = [
     path('cancel-booking/<int:booking_id>/', cancel_booking, name='cancel_booking'),
     path('booking/edit/<int:booking_id>/', edit_booking, name='edit_booking'),
     path('booking/<int:booking_id>/change-status/', change_booking_status, name='change_booking_status'),
+    path('booking-details/', BookingDetailListCreateView.as_view(), name='booking-details-list'),
+    path('bookings/<int:pk>', BookingDetailListRetrieveUpdateView.as_view(), name='bookings-retrieve-update-delete'),
 
     path('', index, name='index'),
     path('about', about, name='about'),
