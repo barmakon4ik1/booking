@@ -1,4 +1,6 @@
 {% extends 'booking/base.html' %}
+{% load form_tags %}
+
 
 {% block title %}
     {{ title }}
@@ -6,9 +8,12 @@
 
 {% block content %}
     <h1>Просмотр вариантов для найма жилой площади</h1>
+
+    <!-- Список объектов жилья -->
     {% if housing %}
         {% for el in housing %}
             <div class="alert alert-warning mt-2">
+                <p>Номер объекта: {{ el.id }}</p>
                  <h3>{{ el.name }}</h3>
                  <p>{{ el.description }}</p>
                  <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>

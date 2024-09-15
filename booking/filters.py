@@ -87,8 +87,7 @@ class HousingFilter(FilterSet):
             'description',
             'country',
             'city',
-            'street',
-            'postal_code'
+            'street'
         ]
         return keyword_filter.filter(queryset, value)
 

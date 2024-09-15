@@ -1,0 +1,73 @@
+{% extends 'booking/base.html' %}
+{% load form_tags %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <h1>Просмотр вариантов для найма жилой площади</h1>
+    <div class="alert alert-warning mt-2">
+
+    <!-- Форма для фильтров -->
+    <form method="get">
+        <div class="row">
+            <!-- Тип объекта -->
+            <div class="col-md-4">
+                <label for="id_type">Выберите тип объекта:</label>
+                {{ filter.form.type|add_class:"form-control" }}
+            </div>
+
+            <!-- Нижний предел стоимости за сутки -->
+            <div class="col-md-4">
+                <label for="id_price_min">Введите мин.цену за сутки:</label>
+                {{ filter.form.price_min|add_class:"form-control" }}
+            </div>
+
+            <!-- Верхний предел стоимости за сутки -->
+            <div class="col-md-4">
+                <label for="id_price_max">Введите макс.цену за сутки:</label>
+                {{ filter.form.price_max|add_class:"form-control" }}
+            </div>
+
+            <!-- Число комнат -->
+            <div class="col-md-4">
+                <label for="id_rooms">Введите желаемое число комнат:</label>
+                {{ filter.form.rooms|add_class:"form-control" }}
+            </div>
+
+            <!-- Диапазон цен -->
+            <div class="col-md-4">
+                <label for="id_price_range">Диапазон цен: мин., макс.</label>
+                {{ filter.form.price_range|add_class:"form-control" }}
+            </div>
+
+            <!-- Ключевые слова -->
+            <div class="col-md-4">
+                <label for="id_keyword">Поиск по ключевым словам:</label>
+                {{ filter.form.keyword|add_class:"form-control" }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Применить фильтры</button>
+    </form>
+    </div>
+
+    <!-- Список объектов жилья -->
+    <!-- Список объектов жилья -->
+    {% if housing %}
+        {% for el in housing %}
+            <div class="alert alert-warning mt-2">
+                <p>Номер объекта: {{ el.id }}</p>
+                 <h3>{{ el.name }}</h3>
+                 <p>{{ el.description }}</p>
+                 <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
+                 <p>Число комнат: {{ el.rooms }}</p>
+                 <p>Стоимость проживания за сутки: {{ el.price }},-€</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning mt-2">
+            <p>Записей нет</p>
+        </div>
+    {% endif %}
+{% endblock %}

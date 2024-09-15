@@ -12,6 +12,8 @@ router.register('reviews', ReviewViewSet, basename='reviews')
 router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
+    path('housing_list/', housing_list, name='housing_list'),
+
     path('', index, name='index'),
     path('about', about, name='about'),
     path('create', create, name='create'),

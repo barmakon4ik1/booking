@@ -1,4 +1,5 @@
 from django.views.generic import DetailView
+from django_filters.views import FilterView
 from rest_framework import viewsets
 from booking.serializers import *
 from django.shortcuts import render, redirect
@@ -18,6 +19,25 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import *
+from django.views.generic import ListView
+
+
+def housing_list(request):
+    housing = Housing.objects.all()
+    housing_filter = HousingFilter(request.GET, queryset=housing)
+
+    context = {
+        'filter': housing_filter,
+        'housing': housing_filter.qs,  # отфильтрованные результаты
+        'title': 'Список жилья'
+    }
+    return render(request, 'booking/housing_list.html', context)
+
+
+# class HousingListView(FilterView):
+#     model = Housing
+#     filterset_class = HousingFilter
+#     template_name = 'booking/housing_list.html'
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -46,6 +66,14 @@ class HousingViewSet(viewsets.ModelViewSet):
     filterset_class = HousingFilter
     ordering_fields = '__all__'  # Позволяет сортировать по всем полям модели
     ordering = ['-created_at']  # Сортировка по умолчанию
+
+    def get_queryset(self):
+        """
+        Получение данных с учетом фильтров
+        """
+        queryset = Housing.objects.all()
+        filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        return filterset.qs
 
     def perform_create(self, serializer):
         """
