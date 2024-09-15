@@ -1,0 +1,18 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    Забронировать объект {{ housing.name }}
+{% endblock %}
+
+{% block content %}
+    <h2>Забронировать объект: {{ housing.name }}</h2>
+    <div class="alert alert-warning mt-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-primary">Забронировать</button>
+        </form>
+    </div>
+    <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+{% endblock %}

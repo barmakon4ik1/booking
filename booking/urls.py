@@ -12,10 +12,12 @@ router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('housing_list/', housing_list, name='housing_list'),
+    path('booking/create/<int:housing_id>/', create_booking, name='create_booking'),
 
     path('', index, name='index'),
     path('about', about, name='about'),
     path('create/', create, name='create'),
+
 
 
     path('login', login_view, name='login'),

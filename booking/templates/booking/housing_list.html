@@ -62,6 +62,9 @@
                  <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
                  <p>Число комнат: {{ el.rooms }}</p>
                  <p>Стоимость проживания за сутки: {{ el.price }},-€</p>
+
+                <!-- Кнопка бронирования -->
+                <a href="{% url 'create_booking' el.id %}" class="btn btn-success mt-2">Забронировать</a>
             </div>
         {% endfor %}
     {% else %}

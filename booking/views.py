@@ -1,10 +1,9 @@
 import logging
-
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
 from booking.serializers import *
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from .filters import *
@@ -45,7 +44,7 @@ def housing_list(request):
     """
     Отображение формы с возможностью фильтрации - меню "Фильтр"
     """
-    try:
+    if request.user.is_authenticated:
         housing_filter = HousingFilter(request.GET, queryset=user_filter(request))
         context = {
             'filter': housing_filter,
@@ -53,17 +52,12 @@ def housing_list(request):
             'title': 'Список жилья'
         }
         return render(request, 'booking/housing_list.html', context)
-    except Exception as e:
-        # Логирование ошибки для отладки
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error occurred: {e}")
-        # Перенаправление на страницу с авторизацией
-        return render(request, 'booking/error.html', {'error_message': str(e)})
+    else:
+        return redirect('login')
 
 
 class BookingViewSet(viewsets.ModelViewSet):
-    queryset = Booking.objects.all()
+    queryset = Booking.objects.all().order_by('id')
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
 
@@ -229,5 +223,27 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'booking/register.html', {'form': form})
 
+
+@login_required
+def create_booking(request, housing_id):
+    housing = get_object_or_404(Housing, pk=housing_id)
+
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user # Устанавливаем текущего пользователя
+            booking.housing = housing # Устанавливаем объект жилья
+            booking.status = Booking.BookingStatus.UNCONFIRMED # Устанавливаем статус
+            booking.save()
+            messages.success(request, 'Бронирование успешно создано и ожидает подтверждения!')
+            return redirect('housing_list')  # Перенаправляем на главную или на страницу с объектом
+    else:
+        form = BookingForm()
+
+    return render(request, 'booking/create_booking.html', {
+        'form': form,
+        'housing': housing
+    })
 
 

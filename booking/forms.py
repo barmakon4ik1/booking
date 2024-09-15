@@ -73,3 +73,18 @@ class UserRegistrationForm(UserCreationForm):
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
 
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['date_from', 'date_to'] # Поля, заполняемые пользователем
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_from = cleaned_data.get("date_from")
+        date_to = cleaned_data.get("date_to")
+
+        # Проверка на валидность диапазона дат
+        if date_from and date_to and date_from > date_to:
+            raise forms.ValidationError("Дата начала бронирования не может быть позже даты окончания.")
+
+        return cleaned_data
