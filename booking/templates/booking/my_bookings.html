@@ -17,16 +17,31 @@
                             <form method="post" action="{% url 'cancel_booking' booking.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Отменить бронирование</button>
-                                <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать</a>
+
+                                <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
                             </form>
+                            <br>
+{#                               {% with review=None %}#}
+{#                                    {% for r in booking.housing.reviews.all %}#}
+{#                                        {% if r.owner == user %}#}
+{#                                            {% with review=r %}#}
+{#                                                {% break %}#}
+{#                                            {% endwith %}#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                    {% if review %}#}
+{#                                        <a href="{% url 'edit_review' review.id %}" class="btn btn-warning">Редактировать отзыв</a>#}
+{#                                    {% else %}#}
+{#                                        <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>#}
+{#                                    {% endif %}#}
+{#                                {% endwith %}#}
+
+
+
                         {% else %}
                             <p>Это бронирование отменено</p>
                         {% endif %}
 
-                        <!-- Кнопка для добавления отзыва после завершённого бронирования -->
-                        {% if booking.status == 'CONFIRMED' and booking.date_to <= today %}
-                            <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-primary mt-2">Оставить отзыв</a>
-                        {% endif %}
                     </div>
                 {% endfor %}
             </ul>

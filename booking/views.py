@@ -29,6 +29,9 @@ from django.utils import timezone
 
 
 def user_filter(request):
+    """
+    Фильтрация объектов по категории пользователей
+    """
     user = request.user
     # Определяем фильтр для видимости
     if user.is_staff or user.is_superuser:
@@ -90,6 +93,9 @@ class BookingDetailListRetrieveUpdateView(RetrieveUpdateAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
@@ -135,12 +141,18 @@ class HousingViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    API - просмотр записей об отзывах
+    """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 
 
 def login_view(request):
+    """
+    Аунтентификация пользователя
+    """
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -170,6 +182,9 @@ def login_view(request):
 
 
 def logout_view(request):
+    """
+    Выход из системы
+    """
     logout(request)
     messages.success(request, 'Вы успешно вышли из системы.')
     return redirect('login')  # Перенаправление на страницу логина или другую нужную страницу
@@ -250,15 +265,17 @@ def register(request):
 
 @login_required
 def create_booking(request, housing_id):
+    """
+    Создание бронирования
+    """
     housing = get_object_or_404(Housing, pk=housing_id)
 
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
-            booking.user = request.user # Устанавливаем текущего пользователя
-            booking.housing = housing # Устанавливаем объект жилья
-            booking.status = Booking.BookingStatus.UNCONFIRMED # Устанавливаем статус
+            booking.owner = request.user  # Устанавливаем владельца бронирования
+            booking.housing = housing  # Устанавливаем жилье для бронирования
             booking.save()
             messages.success(request, 'Бронирование успешно создано и ожидает подтверждения!')
             return redirect('my_bookings')  # Перенаправляем на страницу бронирования
@@ -276,9 +293,38 @@ def my_bookings(request):
     """
     Отображение всех бронирований пользователя
     """
-    bookings = Booking.objects.filter(owner=request.user).order_by('-created_at')
-    today = timezone.now().date()
-    return render(request, 'booking/my_bookings.html', {'bookings': bookings, 'today': today})
+    user = request.user
+    bookings = Booking.objects.filter(owner=user).select_related('housing')
+
+    # Получаем все отзывы текущего пользователя
+    reviews = {booking.housing.id: booking.housing.reviews.filter(owner=user).first() for booking in bookings}
+
+    return render(request, 'booking/my_bookings.html', {
+        'bookings': bookings,
+        'reviews': reviews,
+    })
+
+
+@login_required
+def edit_review(request, review_id):
+    """
+    Редактирование отзыва
+    """
+    review = get_object_or_404(Review, pk=review_id, owner=request.user)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш отзыв был успешно обновлен.')
+            return redirect('my_bookings')  # Возвращаем пользователя на страницу его бронирований
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, 'booking/edit_review.html', {
+        'form': form,
+        'review': review
+    })
 
 
 @login_required
@@ -340,7 +386,7 @@ def change_booking_status(request, booking_id):
             form.save()
             messages.success(request, "Статус бронирования успешно обновлен.")
             # Перенаправляем на страницу со списком бронирований после изменения статуса бронирования
-            return redirect('my_bookings')
+            return redirect('my_confirmation')
     else:
         form = ChangeBookingStatusForm(instance=booking)
 
@@ -352,6 +398,9 @@ def change_booking_status(request, booking_id):
 
 @login_required
 def my_confirmation(request):
+    """
+    Подтверждение бронирования
+    """
     user = request.user
 
     # Если пользователь администратор, получаем все бронирования со статусом PENDING или UNCONFIRMED
@@ -374,21 +423,28 @@ def create_review(request, housing_id):
     housing = get_object_or_404(Housing, pk=housing_id)
 
     # Проверка, бронировал ли пользователь данный объект
-    has_booking = Booking.objects.filter(housing=housing, user=request.user).exists()
+    has_booking = Booking.objects.filter(housing=housing, owner=request.user).exists()
 
     if not has_booking:
         messages.error(request, 'Вы не можете оставить отзыв на объект, который не бронировали.')
         return redirect('index')
 
+    # Проверка, оставлял ли пользователь уже отзыв на данный объект
+    has_review = Review.objects.filter(housing=housing, owner=request.user).exists()
+
+    if has_review:
+        messages.error(request, 'Вы уже оставляли отзыв на этот объект.')
+        return redirect('my_bookings')
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
-            review.owner = request.user
+            review.owner = request.user # Владелец отзыва - текущий пользователь
             review.housing = housing
             review.save()
             messages.success(request, 'Ваш отзыв был успешно добавлен.')
-            return redirect('housing_detail', housing_id=housing.id)
+            return redirect('my_bookings')
     else:
         form = ReviewForm()
 

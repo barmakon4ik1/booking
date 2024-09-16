@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
 
 
@@ -97,8 +98,16 @@ class Review(models.Model):
     housing = models.ForeignKey(Housing, on_delete=models.CASCADE, related_name='reviews')
 
     def __str__(self):
-        return f'Отзыв от {self.user.first_name} {self.user.last_name} для {self.housing.name}'
+        return f'Отзыв от {self.owner.first_name} {self.owner.last_name} для {self.housing.name}'
 
     class Meta:
         verbose_name_plural = _('reviews')
         verbose_name = _('review')
+
+    def get_average_rating(self):
+        avg_rating = self.reviews.aggregate(Avg('rating')).get('rating__avg')
+        return avg_rating if avg_rating is not None else 0  # Возвращаем 0, если нет отзывов
+
+
+
+

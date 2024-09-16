@@ -12,11 +12,12 @@
         {% for el in housing %}
             <div class="alert alert-warning mt-2">
                 <p>Номер объекта: {{ el.id }}</p>
-                 <h3>{{ el.name }}</h3>
+                 <h3><strong>{{ el.name }}</strong></h3>
                  <p>{{ el.description }}</p>
-                 <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
-                 <p>Число комнат: {{ el.rooms }}</p>
-                 <p>Стоимость проживания за сутки: {{ el.price }},-€</p>
+                 <p><strong>Адрес:</strong> {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
+                 <p><strong>Число комнат:</strong> {{ el.rooms }}</p>
+                 <p><strong>Стоимость проживания за сутки:</strong> {{ el.price }},-€</p>
+                <p><strong>Средняя оценка:</strong> {{ el.get_average_rating }}</p>
             </div>
         {% endfor %}
 
