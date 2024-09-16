@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.http import HttpResponseForbidden
 from django.views.generic import DetailView
@@ -323,6 +324,22 @@ def create_booking(request, housing_id):
             date_from = form.cleaned_data['date_from']
             date_to = form.cleaned_data['date_to']
 
+            # Проверка на даты в прошлом
+            if date_from < datetime.now().date() or date_to < datetime.now().date():
+                messages.error(request, 'Выбранные даты не могут быть в прошлом. Пожалуйста, выберите другие даты.')
+                return render(request, 'booking/create_booking.html', {
+                    'form': form,
+                    'housing': housing
+                })
+
+            # Проверка на корректность порядка дат
+            if date_from > date_to:
+                messages.error(request, 'Дата начала не может быть позже даты окончания.')
+                return render(request, 'booking/create_booking.html', {
+                    'form': form,
+                    'housing': housing
+                })
+
             # Проверка на наличие пересекающихся бронирований
             overlapping_bookings = Booking.objects.filter(
                 housing=housing,
@@ -371,16 +388,21 @@ def delete_housing(request, housing_id):
 
 @login_required
 def my_bookings(request):
-    """
-    Отображение всех бронирований пользователя
-    """
+    # Получение всех бронирований пользователя
     bookings = Booking.objects.filter(owner=request.user)
-    reviews = Review.objects.filter(owner=request.user)
 
-    return render(request, 'booking/my_bookings.html', {
+    # Получение всех отзывов пользователя
+    reviews = Review.objects.filter(owner=request.user).select_related('housing')
+
+    # Создание словаря отзывов по id жилья
+    housing_reviews = {review.housing.id: review for review in reviews}
+
+    # Добавление флага наличия отзыва в контексте
+    context = {
         'bookings': bookings,
-        'reviews': reviews,
-    })
+        'housing_reviews': housing_reviews,
+    }
+    return render(request, 'booking/my_bookings.html', context)
 
 
 @login_required

@@ -17,21 +17,20 @@
                             <form method="post" action="{% url 'cancel_booking' booking.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Отменить бронирование</button>
-
                                 <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
+
+                                    {% if booking.housing.id in housing_reviews %}
+                                    <a href="{% url 'edit_review' booking.housing.id %}" class="btn btn-warning">Редактировать отзыв</a>
+
+                                    {% else %}
+                                    <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
+                                    {% endif %}
+
+
                             </form>
                             <br>
 
-                            {% if reviews %}
-                                {% for review in reviews %}
-                                    {% if review.housing == booking.housing %}
-                                        <a href="{% url 'edit_review' review.id %}" class="btn btn-warning">Редактировать отзыв</a>
 
-                                    {% endif %}
-                                {% empty %}
-                                    <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
-                                {% endfor %}
-                            {% endif %}
 
 
                         {% else %}
