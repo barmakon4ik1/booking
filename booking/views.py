@@ -25,6 +25,7 @@ from django.views.generic import ListView
 from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 def user_filter(request):
@@ -276,7 +277,8 @@ def my_bookings(request):
     Отображение всех бронирований пользователя
     """
     bookings = Booking.objects.filter(owner=request.user).order_by('-created_at')
-    return render(request, 'booking/my_bookings.html', {'bookings': bookings})
+    today = timezone.now().date()
+    return render(request, 'booking/my_bookings.html', {'bookings': bookings, 'today': today})
 
 
 @login_required

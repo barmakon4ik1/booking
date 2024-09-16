@@ -14,13 +14,18 @@
                         <p><strong>Дата бронирования:</strong> {{ booking.date_from }} - {{ booking.date_to }}</p>
                         <p><strong>Статус:</strong> {{ booking.get_status_display }}</p>
                         {% if booking.status != 'CANCELED' %}
-                                <form method="post" action="{% url 'cancel_booking' booking.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger">Отменить бронирование</button>
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Отменить бронирование</button>
                                 <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать</a>
-                                </form>
+                            </form>
                         {% else %}
                             <p>Это бронирование отменено</p>
+                        {% endif %}
+
+                        <!-- Кнопка для добавления отзыва после завершённого бронирования -->
+                        {% if booking.status == 'CONFIRMED' and booking.date_to <= today %}
+                            <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-primary mt-2">Оставить отзыв</a>
                         {% endif %}
                     </div>
                 {% endfor %}
