@@ -1,0 +1,18 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    Изменение статуса бронирования
+{% endblock %}
+
+{% block content %}
+    <h2>Изменение статуса бронирования объекта</h2>
+    <div class="alert alert-warning mt-2">
+        {% if request.user == booking.housing.owner or request.user.is_staff %}
+            <p><strong>Объект:</strong> {{ booking.housing.name }}</p>
+            <p><strong>Дата бронирования:</strong> {{ booking.date_from }} - {{ booking.date_to }}</p>
+            <p><strong>Фамилия бронировавшего</strong>{{ booking.user }}</p>
+            <a href="{% url 'change_booking_status' booking.id %}" class="btn btn-warning">Изменить статус</a>
+        {% endif %}
+    </div>
+    <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+{% endblock %}

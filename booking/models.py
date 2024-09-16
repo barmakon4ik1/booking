@@ -21,7 +21,7 @@ class Housing(models.Model):
     rooms = models.IntegerField(_('Number of rooms'))
     description = models.TextField(_('Description'))
     price = models.DecimalField(_('Price'), max_digits=10, decimal_places=2)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_housings')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_housings')
     is_visible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -44,12 +44,33 @@ class Booking(models.Model):
         CANCELED = 'CANCELED', _('Canceled')
         UNCONFIRMED = 'UNCONFIRMED', _('Unconfirmed')
 
-    status = models.CharField(_('Status'), max_length=20, choices=BookingStatus.choices, default=BookingStatus.UNCONFIRMED)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
-    created_at = models.DateTimeField(auto_now_add=True)
-    date_from = models.DateField(_('Booking from'), null=True, blank=True)
-    date_to = models.DateField(_('Booking to'), null=True, blank=True)
-    housing = models.ForeignKey(Housing, on_delete=models.CASCADE, related_name='bookings')
+    status = models.CharField(
+        _('Status'),
+        max_length=20,
+        choices=BookingStatus.choices,
+        default=BookingStatus.UNCONFIRMED
+    ) # Статус бронирования
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    ) # Пользователь, который забронировал
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    ) # Дата создания бронирования
+    date_from = models.DateField(
+        _('Booking from'),
+        null=True,
+        blank=True) # Дата начала бронирования
+    date_to = models.DateField(
+        _('Booking to'),
+        null=True,
+        blank=True) # Дата окончания бронирования
+    housing = models.ForeignKey(
+        Housing,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )  # Жилье, которое было забронировано
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -57,7 +78,7 @@ class Booking(models.Model):
             raise ValidationError(_('Booking start date cannot be after the end date.'))
 
     def __str__(self):
-        return f'Время бронирования объекта с {self.date_from} по {self.date_to}'
+        return f"Бронирование {self.housing} от {self.date_from} до {self.date_to}"
 
     class Meta:
         verbose_name_plural = _('bookings')

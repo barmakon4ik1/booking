@@ -1,0 +1,15 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    <meta charset="UTF-8">
+    <title>USER LOGIN</title>
+{% endblock %}
+
+{% block content %}
+    <div class="alert alert-warning mt-2">
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Зарегистрироваться</button>
+    </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content %}
+    <h2>На нашем сайте есть следующие варианты для найма:</h2>
+
+    <!-- Список объектов жилья -->
+    {% if housing %}
+        {% for el in housing %}
+            <div class="alert alert-warning mt-2">
+                <p>Номер объекта: {{ el.id }}</p>
+                 <h3>{{ el.name }}</h3>
+                 <p>{{ el.description }}</p>
+                 <p>Адрес: {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
+                 <p>Число комнат: {{ el.rooms }}</p>
+                 <p>Стоимость проживания за сутки: {{ el.price }},-€</p>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="alert alert-warning mt-2">
+            <p>Записей нет</p>
+        </div>
+    {% endif %}
+{% endblock %}
