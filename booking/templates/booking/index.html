@@ -17,9 +17,13 @@
                  <p><strong>Адрес:</strong> {{ el.street }} {{ el.house_number }}, {{ el.post_code }}, {{ el.city }}, {{ el.country }}</p>
                  <p><strong>Число комнат:</strong> {{ el.rooms }}</p>
                  <p><strong>Стоимость проживания за сутки:</strong> {{ el.price }},-€</p>
-                <p><strong>Средняя оценка:</strong> {{ el.get_average_rating }}</p>
+                 <p><strong>Средняя оценка:</strong> {{ el.get_average_rating }}</p>
                 {% if user == el.owner or user.is_staff %}
                     <a href="{% url 'edit_housing' el.id %}" class="btn btn-warning">Редактировать объект</a>
+                    <form action="{% url 'delete_housing' el.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Удалить объект</button>
+                    </form>
                 {% endif %}
             </div>
         {% endfor %}

@@ -1,7 +1,7 @@
 from django import forms
 from .models import *
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 class LoginForm(forms.Form):
@@ -76,6 +76,9 @@ class HousingForm(forms.ModelForm):
 
 
 class UserRegistrationForm(UserCreationForm):
+    """
+    Форма регистрации нового пользователя
+    """
     first_name = forms.CharField(max_length=30, required=True, help_text='Введите ваше имя')
     last_name = forms.CharField(max_length=30, required=True, help_text='Введите вашу фамилию')
     email = forms.EmailField(required=True, help_text='Введите действующий email')
@@ -86,6 +89,9 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class BookingForm(forms.ModelForm):
+    """
+    Форма ввода дат для бронирования
+    """
     class Meta:
         model = Booking
         fields = ['date_from', 'date_to'] # Поля, заполняемые пользователем
@@ -159,6 +165,9 @@ class ChangeBookingStatusForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
+    """
+    Форма для отзывов и рейтинга
+    """
     class Meta:
         model = Review
         fields = ['rating', 'text']
@@ -170,3 +179,17 @@ class ReviewForm(forms.ModelForm):
             'rating': 'Рейтинг (1-5)',
             'text': 'Ваш отзыв'
         }
+
+
+class CustomLoginForm(AuthenticationForm):
+    """
+    Пользовательская форма входа
+    """
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control form-control-lg',  # Добавляем класс для настройки ширины
+        'placeholder': 'Email'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control form-control-lg',
+        'placeholder': 'Пароль'
+    }))

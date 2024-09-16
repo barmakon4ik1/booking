@@ -1,3 +1,46 @@
+{#{% extends 'booking/base.html' %}#}
+{##}
+{#{% block title %}#}
+{#    <meta charset="UTF-8">#}
+{#    <title>USER LOGIN</title>#}
+{#{% endblock %}#}
+{##}
+{#{% block content %}#}
+{#    <div class="alert alert-warning mt-2">#}
+{#        <h3>Для работы с системой необходимо войти в неё</h3><br>#}
+{#        #}
+{#        {% if user.is_authenticated %}#}
+{#            <p>Добро пожаловать, {{ user.username }}!</p>#}
+{#            <a href="{% url 'logout' %}" class="btn btn-secondary">Выход</a>#}
+{#        {% else %}#}
+{#            <form method="post">#}
+{#                {% csrf_token %}#}
+{#                {{ form.as_p }}#}
+{#                <button type="submit" class="btn btn-primary">Войти</button>#}
+{#            </form>#}
+{##}
+{#            <!-- Сообщения об ошибках или успехе -->#}
+{#            {% if messages %}#}
+{#                <ul class="alert alert-danger mt-3">#}
+{#                    {% for message in messages %}#}
+{#                        <li>{{ message }}</li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#            {% endif %}#}
+{##}
+{#            <!-- Ссылка на регистрацию -->#}
+{#            <p>#}
+{#                Еще не зарегистрированы? <a href="{% url 'register' %}">Создать аккаунт</a>#}
+{#            </p>#}
+{##}
+{#            <!-- Ссылка на восстановление пароля -->#}
+{#            <p>#}
+{#                Забыли пароль? <a href="{% url 'password_reset' %}">Восстановить пароль</a>#}
+{#            </p>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#{% endblock %}#}
+
 {% extends 'booking/base.html' %}
 
 {% block title %}
@@ -6,9 +49,16 @@
 {% endblock %}
 
 {% block content %}
+    <style>
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; /* Полная ширина поля */
+            max-width: 400px; /* Ограничение максимальной ширины */
+        }
+    </style>
+
     <div class="alert alert-warning mt-2">
         <h3>Для работы с системой необходимо войти в неё</h3><br>
-        
+
         {% if user.is_authenticated %}
             <p>Добро пожаловать, {{ user.username }}!</p>
             <a href="{% url 'logout' %}" class="btn btn-secondary">Выход</a>
@@ -40,3 +90,4 @@
         {% endif %}
     </div>
 {% endblock %}
+

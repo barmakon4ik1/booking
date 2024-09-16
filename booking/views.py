@@ -353,6 +353,23 @@ def create_booking(request, housing_id):
 
 
 @login_required
+def delete_housing(request, housing_id):
+    """
+    Удаление объекта недвижимости.
+    Доступно только владельцам объекта или администраторам.
+    """
+    housing = get_object_or_404(Housing, pk=housing_id)
+
+    if request.user == housing.owner or request.user.is_staff:
+        housing.delete()
+        messages.success(request, 'Объект был успешно удален.')
+    else:
+        messages.error(request, 'У вас нет прав для удаления этого объекта.')
+
+    return redirect('index')
+
+
+@login_required
 def my_bookings(request):
     """
     Отображение всех бронирований пользователя
