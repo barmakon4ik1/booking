@@ -10,9 +10,11 @@ class LoginForm(forms.Form):
 
 
 class HousingForm(forms.ModelForm):
+
     class Meta:
         model = Housing
         fields = ['name',
+                  'type',
                   'description',
                   'street',
                   'house_number',

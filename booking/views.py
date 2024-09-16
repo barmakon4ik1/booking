@@ -223,7 +223,7 @@ def about(request):
 @login_required
 def create(request):
     """
-    Регистрация объекта недвижимости
+    Регистрация и редактирование объекта недвижимости
     """
     try:
         user = request.user
@@ -318,6 +318,28 @@ def create_booking(request, housing_id):
             booking = form.save(commit=False)
             booking.owner = request.user  # Устанавливаем владельца бронирования
             booking.housing = housing  # Устанавливаем жилье для бронирования
+
+            # Получаем даты из формы
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+
+            # Проверка на наличие пересекающихся бронирований
+            overlapping_bookings = Booking.objects.filter(
+                housing=housing,
+                # Проверяем только подтвержденные и ожидающие подтверждения бронирования
+                status__in=[Booking.BookingStatus.CONFIRMED, Booking.BookingStatus.PENDING]
+            ).filter(
+                # Проверка на пересечение дат
+                Q(date_from__lte=date_to, date_to__gte=date_from)
+            )
+
+            if overlapping_bookings.exists():
+                messages.error(request, 'На выбранные даты объект уже забронирован. Пожалуйста, выберите другие даты.')
+                return render(request, 'booking/create_booking.html', {
+                    'form': form,
+                    'housing': housing
+                })
+
             booking.save()
             messages.success(request, 'Бронирование успешно создано и ожидает подтверждения!')
             return redirect('my_bookings')  # Перенаправляем на страницу бронирования

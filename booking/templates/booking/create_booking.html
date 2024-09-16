@@ -11,6 +11,14 @@
             {% csrf_token %}
             {{ form.as_p }}  <!-- Форматируем поля с виджетами выбора даты -->
 
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <button type="submit" class="btn btn-primary">Забронировать</button>
         </form>
     </div>

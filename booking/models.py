@@ -6,14 +6,21 @@ from django.utils.translation import gettext_lazy as _
 
 class Housing(models.Model):
     class HousingType(models.TextChoices):
-        APARTMENT = 'APARTMENT', _('Apartment')
-        HOUSE = 'HOUSE', _('House')
-        STUDIO = 'STUDIO', _('Studio')
-        CASTLE = 'CASTLE', _('Castle')
-        HOTEL = 'HOTEL', _('Hotel')
+        APARTMENT = 'APARTMENT', 'Квартира'
+        HOUSE = 'HOUSE', 'Дом'
+        STUDIO = 'STUDIO', 'Студия'
+        CASTLE = 'CASTLE', 'Замок'
+        HOTEL = 'HOTEL', 'Гостиница'
+        VILLA = 'VILLA', 'Вилла'
+        COTTAGE = 'COTTAGE', 'Коттедж'
 
     name = models.CharField(_('Name of object'), max_length=100)
-    type = models.CharField(_('Type of object'), max_length=20, choices=HousingType.choices, default=HousingType.APARTMENT)
+    type = models.CharField(
+        _('Type of object'),
+        max_length=20,
+        choices=HousingType.choices,
+        default=HousingType.APARTMENT
+    )
     country = models.CharField(_('Country'), max_length=50)
     post_code = models.CharField(_('Postal code'), max_length=10)
     city = models.CharField(_('City'), max_length=50)
