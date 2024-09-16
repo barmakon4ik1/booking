@@ -21,21 +21,17 @@
                                 <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
                             </form>
                             <br>
-{#                               {% with review=None %}#}
-{#                                    {% for r in booking.housing.reviews.all %}#}
-{#                                        {% if r.owner == user %}#}
-{#                                            {% with review=r %}#}
-{#                                                {% break %}#}
-{#                                            {% endwith %}#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                    {% if review %}#}
-{#                                        <a href="{% url 'edit_review' review.id %}" class="btn btn-warning">Редактировать отзыв</a>#}
-{#                                    {% else %}#}
-{#                                        <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>#}
-{#                                    {% endif %}#}
-{#                                {% endwith %}#}
 
+                            {% if reviews %}
+                                {% for review in reviews %}
+                                    {% if review.housing == booking.housing %}
+                                        <a href="{% url 'edit_review' review.id %}" class="btn btn-warning">Редактировать отзыв</a>
+
+                                    {% endif %}
+                                {% empty %}
+                                    <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
+                                {% endfor %}
+                            {% endif %}
 
 
                         {% else %}

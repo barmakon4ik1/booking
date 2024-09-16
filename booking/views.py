@@ -293,11 +293,8 @@ def my_bookings(request):
     """
     Отображение всех бронирований пользователя
     """
-    user = request.user
-    bookings = Booking.objects.filter(owner=user).select_related('housing')
-
-    # Получаем все отзывы текущего пользователя
-    reviews = {booking.housing.id: booking.housing.reviews.filter(owner=user).first() for booking in bookings}
+    bookings = Booking.objects.filter(owner=request.user)
+    reviews = Review.objects.filter(owner=request.user)
 
     return render(request, 'booking/my_bookings.html', {
         'bookings': bookings,
