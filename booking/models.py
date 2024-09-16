@@ -50,7 +50,7 @@ class Booking(models.Model):
         choices=BookingStatus.choices,
         default=BookingStatus.UNCONFIRMED
     ) # Статус бронирования
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='bookings'
@@ -93,7 +93,7 @@ class Review(models.Model):
     rating = models.IntegerField(_('Rating'))
     text = models.TextField(_('Review'))
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
     housing = models.ForeignKey(Housing, on_delete=models.CASCADE, related_name='reviews')
 
     def __str__(self):

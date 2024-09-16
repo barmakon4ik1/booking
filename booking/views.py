@@ -3,7 +3,6 @@ from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
-
 from booking.serializers import *
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
@@ -276,7 +275,7 @@ def my_bookings(request):
     """
     Отображение всех бронирований пользователя
     """
-    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+    bookings = Booking.objects.filter(owner=request.user).order_by('-created_at')
     return render(request, 'booking/my_bookings.html', {'bookings': bookings})
 
 
@@ -285,7 +284,7 @@ def cancel_booking(request, booking_id):
     """
     Отмена бронирования
     """
-    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    booking = get_object_or_404(Booking, id=booking_id, owner=request.user)
 
     if request.method == 'POST':
         form = CancelBookingForm(request.POST, instance=booking)
@@ -304,7 +303,7 @@ def edit_booking(request, booking_id):
     Редактирование бронирования
     """
     # Проверяем, что бронирование принадлежит пользователю
-    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    booking = get_object_or_404(Booking, id=booking_id, owner=request.user)
 
     if request.method == 'POST':
         form = EditBookingForm(request.POST, instance=booking)
