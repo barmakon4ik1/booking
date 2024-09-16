@@ -30,21 +30,4 @@
                 <p>У вас нет бронирований.</p>
             </div>
         {% endif %}
-    <h2>Объекты, ожидающие Вашего подтверждения</h2>
-    {% if bookings_status %}
-        <ul class="list-group">
-            {% for booking_status in bookings_status %}
-                <div class="alert alert-warning mt-2">
-                        <p>Объект: <strong>{{ booking_status.housing.name }}</strong></p>
-                        <p>Забронировано с {{ booking_status.date_from }} по {{ booking_status.date_to }}</p>
-                        <p>Статус бронирования: <strong>{{ booking_status.get_status_display }}</strong></p>
-                        <a href="{% url 'change_booking_status' booking_status.id %}" class="btn btn-primary">Подтвердить бронирование</a>
-                </div>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <div class="alert alert-warning mt-2">
-            <p>У вас нет объектов, ожидающих изменение статуса бронирования.</p>
-        </div>
-    {% endif %}
 {% endblock %}

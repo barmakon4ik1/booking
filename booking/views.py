@@ -349,7 +349,7 @@ def change_booking_status(request, booking_id):
 
 
 @login_required
-def pending_bookings(request):
+def my_confirmation(request):
     user = request.user
 
     # Если пользователь администратор, получаем все бронирования со статусом PENDING или UNCONFIRMED
@@ -361,5 +361,36 @@ def pending_bookings(request):
             housing__owner=user, status__in=['PENDING', 'UNCONFIRMED']
         ).order_by('-created_at')
 
-    return render(request, 'my_booking.html', {'bookings_status': bookings_status})
+    return render(request, 'booking/my_confirmation.html', {'bookings_status': bookings_status})
 
+
+@login_required
+def create_review(request, housing_id):
+    """
+    Функция оставления отзыва
+    """
+    housing = get_object_or_404(Housing, pk=housing_id)
+
+    # Проверка, бронировал ли пользователь данный объект
+    has_booking = Booking.objects.filter(housing=housing, user=request.user).exists()
+
+    if not has_booking:
+        messages.error(request, 'Вы не можете оставить отзыв на объект, который не бронировали.')
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.owner = request.user
+            review.housing = housing
+            review.save()
+            messages.success(request, 'Ваш отзыв был успешно добавлен.')
+            return redirect('housing_detail', housing_id=housing.id)
+    else:
+        form = ReviewForm()
+
+    return render(request, 'booking/create_review.html', {
+        'form': form,
+        'housing': housing
+    })

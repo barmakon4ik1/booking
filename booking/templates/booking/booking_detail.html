@@ -15,4 +15,24 @@
         {% endif %}
     </div>
     <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+
+    <h2>Отзывы о {{ housing.name }}</h2>
+    <div class="alert alert-warning mt-2">
+    {% if housing.reviews.exists %}
+        <ul class="list-group">
+            {% for review in housing.reviews.all %}
+
+                    <strong>{{ review.owner.first_name }} {{ review.owner.last_name }}</strong>
+                    <p>Рейтинг: {{ review.rating }}</p>
+                    <p>{{ review.text }}</p>
+                    <p>Оставлен: {{ review.created_at }}</p>
+
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет отзывов для этого объекта.</p>
+    {% endif %}
+    </div>
+
+
 {% endblock %}
