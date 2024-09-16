@@ -1,4 +1,6 @@
 import logging
+
+from django.http import HttpResponseForbidden
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
@@ -62,6 +64,9 @@ def housing_list(request):
 
 
 class BookingViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows bookings to be viewed or edited.
+    """
     queryset = Booking.objects.all().order_by('id')
     serializer_class = BookingSerializer
     permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
@@ -215,34 +220,71 @@ def about(request):
     return render(request, 'booking/about.html')
 
 
+@login_required
 def create(request):
     """
     Регистрация объекта недвижимости
     """
     try:
         user = request.user
-        if user.is_authenticated:
-            error = ''
-            if request.method == 'POST':
-                form = HousingForm(request.POST)
-                if form.is_valid():
-                    form.save()
-                    return redirect('/')
-                else:
-                    error = 'Неверные данные'
+        error = ''
 
-            form = HousingForm()
-            context = {
-                'form': form,
-                'error': error
-            }
-            return render(request, 'booking/create.html', context)
-        else:
-            return redirect('login')
+        if request.method == 'POST':
+            form = HousingForm(request.POST)
+            if form.is_valid():
+                # Создаем объект, но не сохраняем его сразу
+                housing = form.save(commit=False)
+                # Автоматически задаем владельца объекта
+                housing.owner = user
+                # Сохраняем объект с заполненным полем owner
+                housing.save()
+                return redirect('/')
+            else:
+                error = 'Неверные данные'
+
+        form = HousingForm()
+        context = {
+            'form': form,
+            'error': error
+        }
+        return render(request, 'booking/create.html', context)
+
     except Exception as e:
         logger = logging.getLogger(__name__)
         logger.error(f"Error occurred: {e}")
-        # Перенаправление на страницу с авторизацией
+        # Перенаправление на главную страницу
+        return render(request, 'booking/index.html', {'error_message': str(e)})
+
+
+@login_required
+def edit_housing(request, housing_id):
+    """
+    Редактирование объекта недвижимости для владельца или администратора
+    """
+    try:
+        housing = get_object_or_404(Housing, id=housing_id)
+        user = request.user
+
+        # Проверка, что пользователь является владельцем объекта или администратором
+        if user != housing.owner and not user.is_staff:
+            return HttpResponseForbidden("У вас нет прав для редактирования этого объекта.")
+
+        if request.method == 'POST':
+            form = HousingForm(request.POST, instance=housing)
+            if form.is_valid():
+                form.save()
+                return redirect('/')  # Перенаправление на главную страницу или список объектов
+        else:
+            form = HousingForm(instance=housing)
+
+        return render(request, 'booking/edit_housing.html', {
+            'form': form,
+            'housing': housing
+        })
+
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error occurred while editing housing: {e}")
         return render(request, 'booking/error.html', {'error_message': str(e)})
 
 

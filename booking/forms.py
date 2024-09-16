@@ -12,7 +12,17 @@ class LoginForm(forms.Form):
 class HousingForm(forms.ModelForm):
     class Meta:
         model = Housing
-        fields = '__all__'
+        fields = ['name',
+                  'description',
+                  'street',
+                  'house_number',
+                  'post_code',
+                  'city',
+                  'country',
+                  'rooms',
+                  'price',
+                  'is_visible'
+                  ]
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',

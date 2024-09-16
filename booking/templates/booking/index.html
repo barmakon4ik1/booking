@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <h2>На нашем сайте есть следующие варианты для найма:</h2>
+    <h2>На нашем сайте есть следующие варианты для бронирования:</h2>
 
     <!-- Список объектов жилья -->
     {% if housing %}
@@ -18,6 +18,9 @@
                  <p><strong>Число комнат:</strong> {{ el.rooms }}</p>
                  <p><strong>Стоимость проживания за сутки:</strong> {{ el.price }},-€</p>
                 <p><strong>Средняя оценка:</strong> {{ el.get_average_rating }}</p>
+                {% if user == el.owner or user.is_staff %}
+                    <a href="{% url 'edit_housing' el.id %}" class="btn btn-warning">Редактировать объект</a>
+                {% endif %}
             </div>
         {% endfor %}
 

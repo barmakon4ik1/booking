@@ -37,6 +37,10 @@ class Housing(models.Model):
             models.Index(fields=['price']),
         ]
 
+    def get_average_rating(self):
+        avg_rating = self.reviews.aggregate(Avg('rating')).get('rating__avg')
+        return avg_rating if avg_rating is not None else 0  # Возвращаем 0, если нет отзывов
+
 
 class Booking(models.Model):
     class BookingStatus(models.TextChoices):
@@ -104,9 +108,7 @@ class Review(models.Model):
         verbose_name_plural = _('reviews')
         verbose_name = _('review')
 
-    def get_average_rating(self):
-        avg_rating = self.reviews.aggregate(Avg('rating')).get('rating__avg')
-        return avg_rating if avg_rating is not None else 0  # Возвращаем 0, если нет отзывов
+
 
 
 
