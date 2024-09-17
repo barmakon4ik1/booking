@@ -32,6 +32,7 @@ class Housing(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_housings')
     is_visible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    views = models.IntegerField(default=0)  # Поле для хранения количества просмотров
 
     def __str__(self):
         return f'{self.name} (Owner: {self.owner.first_name} {self.owner.last_name})'

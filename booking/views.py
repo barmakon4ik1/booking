@@ -18,7 +18,7 @@ from django.contrib import messages
 from .permissions import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, F
+from django.db.models import Q, F, Count
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
@@ -53,8 +53,11 @@ def housing_list(request):
     Отображение формы с возможностью фильтрации - меню "Фильтр"
     """
     if request.user.is_authenticated:
-        # Получаем все объекты
-        housing = Housing.objects.annotate(average_rating=Avg('reviews__rating'))
+        # Аннотируем количество отзывов и средний рейтинг
+        housing = Housing.objects.annotate(
+            review_count=Count('reviews'),  # Подсчет количества отзывов
+            average_rating=Avg('reviews__rating')
+        )
 
         # Применяем фильтры
         filter = HousingFilter(request.GET, queryset=housing)
@@ -92,6 +95,10 @@ def housing_list(request):
             filtered_housing = filtered_housing.order_by('post_code')
         elif sort_by == 'post_code_desc':
             filtered_housing = filtered_housing.order_by('-post_code')
+        elif sort_by == 'views_desc':
+            filtered_housing = filtered_housing.order_by('-views')  # Сортировка по просмотрам
+        elif sort_by == 'review_count_desc':
+            filtered_housing = filtered_housing.order_by('-review_count')  # Сортировка по количеству отзывов
 
         # Передача данных в шаблон
         context = {
