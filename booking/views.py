@@ -50,9 +50,29 @@ def user_filter(request):
 
 def housing_list(request):
     """
-    Отображение формы с возможностью фильтрации - меню "Фильтр"
+    Список объектов жилья с возможностью сортировки и фильтрации
     """
     if request.user.is_authenticated:
+        # Логика фильтрации объектов
+        housing = Housing.objects.all()
+
+        # Получаем ключевое слово из GET-запроса
+        keyword = request.GET.get('keyword', None)
+
+        if keyword:
+            # Фильтруем объекты по ключевому слову
+            housing = housing.filter(Q(description__icontains=keyword) | Q(name__icontains=keyword))
+
+            # Сохраняем запрос в историю поиска
+            if request.user.is_authenticated:
+                search_entry, created = SearchHistory.objects.get_or_create(
+                    user=request.user, keyword=keyword
+                )
+                if not created:
+                    # Если запрос уже существует, увеличиваем счетчик
+                    search_entry.search_count = F('search_count') + 1
+                    search_entry.save()
+
         # Аннотируем количество отзывов и средний рейтинг
         housing = Housing.objects.annotate(
             review_count=Count('reviews'),  # Подсчет количества отзывов
@@ -100,11 +120,27 @@ def housing_list(request):
         elif sort_by == 'review_count_desc':
             filtered_housing = filtered_housing.order_by('-review_count')  # Сортировка по количеству отзывов
 
+        # Получение популярных запросов (по количеству запросов, сортировка по `search_count`)
+        popular_searches = SearchHistory.objects.values('keyword').annotate(
+            count=models.Count('keyword')
+        ).order_by('-count')[:5]  # Выводим топ-5 популярных запросов
+
+        # Получаем популярные объявления, отсортированные по количеству просмотров
+        popular_housing_ids = ViewHistory.objects.values('housing').annotate(
+            count=models.Count('view_count')
+        ).order_by('-count').values_list('housing', flat=True)
+
+        # Добавляем популярные объявления в контекст
+        popular_housing = Housing.objects.filter(id__in=popular_housing_ids)
+
         # Передача данных в шаблон
         context = {
             'housing': filtered_housing,
             'filter': filter,
             'sort_by': sort_by,  # Передаем значение сортировки обратно в шаблон
+            'keyword': keyword,
+            'popular_searches': popular_searches,  # Передаем популярные запросы в шаблон
+            'popular_housing': popular_housing,
         }
         return render(request, 'booking/housing_list.html', context)
     else:
@@ -601,3 +637,27 @@ def create_review(request, housing_id):
         'form': form,
         'housing': housing
     })
+
+
+@login_required
+def housing_detail(request, housing_id):
+    """
+    Детальная страница объекта жилья
+    """
+    housing = get_object_or_404(Housing, pk=housing_id)
+
+    # Проверка, есть ли у пользователя запись о просмотре данного объявления
+    if request.user.is_authenticated:
+        view_entry, created = ViewHistory.objects.get_or_create(
+            user=request.user,
+            housing=housing
+        )
+        if not created:
+            # Если запись о просмотре уже существует, увеличиваем счетчик просмотров
+            view_entry.view_count = F('view_count') + 1
+            view_entry.save()
+
+    context = {
+        'housing': housing,
+    }
+    return render(request, 'booking/housing_detail.html', context)

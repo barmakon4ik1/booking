@@ -44,8 +44,10 @@
 
             <!-- Ключевые слова -->
             <div class="col-md-4">
-                <label for="id_keyword">Поиск по ключевым словам:</label>
-                {{ filter.form.keyword|add_class:"form-control" }}
+{#                <label for="id_keyword">Поиск по ключевым словам:</label>#}
+{#                {{ filter.form.keyword|add_class:"form-control" }}#}
+                    <label for="id_keyword">Поиск по ключевым словам:</label>
+                    <input type="text" name="keyword" id="id_keyword" class="form-control" value="{{ request.GET.keyword }}">
             </div>
         </div>
 
@@ -80,6 +82,36 @@
             </div>
         </form>
     </div>
+
+    <!-- Популярные запросы -->
+    <div class="alert alert-warning mt-2">
+        <h4>Популярные запросы:</h4>
+        {% if popular_searches %}
+            <ul>
+                {% for search in popular_searches %}
+                    <li><a href="?keyword={{ search.keyword }}">{{ search.keyword }}</a> ({{ search.count }} раз)</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Популярных запросов пока нет.</p>
+        {% endif %}
+    </div>
+
+    <!-- Популярные объявления -->
+{#    <div class="alert alert-warning mt-2">#}
+{#        <h4>Популярные объявления:</h4>#}
+{#        {% if popular_housing %}#}
+{#            <ul>#}
+{#                {% for el in popular_housing %}#}
+{#                    <li>#}
+{#                        <a href="{% url 'housing_detail' el.id %}">{{ el.name }}</a> (Просмотров: {{ el.viewhistory_set.aggregate(total_views=Sum('view_count')).total_views }})#}
+{#                    </li>#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#        {% else %}#}
+{#            <p>Популярных объявлений пока нет.</p>#}
+{#        {% endif %}#}
+{#    </div>#}
 
     <!-- Список объектов жилья -->
     {% if housing %}

@@ -117,7 +117,29 @@ class Review(models.Model):
         verbose_name = _('review')
 
 
+class SearchHistory(models.Model):
+    """
+    Модель хранения истории запросов
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Optional: привязка к пользователю
+    keyword = models.CharField(max_length=255)  # Ключевое слово поиска
+    search_count = models.PositiveIntegerField(default=1)  # Количество использования этого запроса
+    last_searched_at = models.DateTimeField(auto_now=True)  # Последний раз, когда был выполнен поиск
+
+    def __str__(self):
+        return f"{self.keyword} ({self.search_count} раз)"
 
 
+class ViewHistory(models.Model):
+    """
+    Модель хранения истории просмотров
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Связь с пользователем
+    housing = models.ForeignKey(Housing, on_delete=models.CASCADE)  # Объявление, которое просмотрено
+    view_count = models.PositiveIntegerField(default=1)  # Количество просмотров
+    last_viewed_at = models.DateTimeField(auto_now=True)  # Время последнего просмотра
+
+    def __str__(self):
+        return f"{self.housing.name} - {self.view_count} просмотров"
 
 
