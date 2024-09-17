@@ -18,7 +18,7 @@ from django.contrib import messages
 from .permissions import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
@@ -53,11 +53,35 @@ def housing_list(request):
     Отображение формы с возможностью фильтрации - меню "Фильтр"
     """
     if request.user.is_authenticated:
-        housing_filter = HousingFilter(request.GET, queryset=user_filter(request))
+        # Получаем все объекты
+        housing = Housing.objects.all()
+
+        # Применяем фильтры
+        filter = HousingFilter(request.GET, queryset=housing)
+        filtered_housing = filter.qs
+
+        # Получаем параметр сортировки
+        sort_by = request.GET.get('sort_by')
+
+        # Применение сортировки после фильтрации
+        if sort_by == 'price_asc':
+            filtered_housing = filtered_housing.order_by('price')
+        elif sort_by == 'price_desc':
+            filtered_housing = filtered_housing.order_by('-price')
+        elif sort_by == 'date_newest':
+            filtered_housing = filtered_housing.order_by('-created_at')
+        elif sort_by == 'date_oldest':
+            filtered_housing = filtered_housing.order_by('created_at')
+        elif sort_by == 'rooms_asc':
+            filtered_housing = filtered_housing.order_by('rooms')
+        elif sort_by == 'rooms_desc':
+            filtered_housing = filtered_housing.order_by('-rooms')
+
+        # Передача данных в шаблон
         context = {
-            'filter': housing_filter,
-            'housing': housing_filter.qs,  # отфильтрованные результаты
-            'title': 'Список жилья'
+            'housing': filtered_housing,
+            'filter': filter,
+            'sort_by': sort_by,  # Передаем значение сортировки обратно в шаблон
         }
         return render(request, 'booking/housing_list.html', context)
     else:
@@ -312,6 +336,7 @@ def create_booking(request, housing_id):
     Создание бронирования
     """
     housing = get_object_or_404(Housing, pk=housing_id)
+    reviews = Review.objects.filter(housing=housing)
 
     if request.method == 'POST':
         form = BookingForm(request.POST)
@@ -365,7 +390,8 @@ def create_booking(request, housing_id):
 
     return render(request, 'booking/create_booking.html', {
         'form': form,
-        'housing': housing
+        'housing': housing,
+        'reviews': reviews
     })
 
 

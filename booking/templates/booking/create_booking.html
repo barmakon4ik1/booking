@@ -7,6 +7,15 @@
 {% block content %}
     <h2>Забронировать объект: {{ housing.name }}</h2>
     <div class="alert alert-warning mt-2">
+        <p><strong>Номер объекта:</strong> {{ housing.id }}</p>
+                 <p><strong>{{ housing.description }}</strong></p>
+                 <p><strong>Адрес:</strong> {{ housing.street }} {{ housing.house_number }}, {{ housing.post_code }}, {{ housing.city }}, {{ housing.country }}</p>
+                 <p><strong>Число комнат:</strong> {{ housing.rooms }}</p>
+                 <p><strong>Стоимость проживания за сутки:</strong> {{ housing.price }},-€</p>
+                <p><strong>Средняя оценка:</strong> {{ housing.get_average_rating }}</p>
+    </div>
+
+    <div class="alert alert-warning mt-2">
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}  <!-- Форматируем поля с виджетами выбора даты -->
@@ -20,7 +29,22 @@
             {% endif %}
 
             <button type="submit" class="btn btn-primary">Забронировать</button>
+
         </form>
-    </div>
     <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+    </div>
+
+     <div class="alert alert-warning mt-2">
+        <h3><strong>Отзывы:</strong></h3>
+        {% if reviews %}
+            {% for el in reviews %}
+                <p><strong>Пользователь:</strong> {{ el.owner.username }}</p>
+                <p><strong>Оценка:</strong> {{ el.rating }}</p>
+                <p><strong>Отзыв:</strong> {{ el.text }}</p>
+                <hr>
+            {% endfor %}
+        {% else %}
+            <p>Отзывов пока еще нет, вы можете оставить первый.</p>
+        {% endif %}
+    </div>
 {% endblock %}
