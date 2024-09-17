@@ -13,7 +13,9 @@
                         <p>Объект: <strong>{{ booking_status.housing.name }}</strong></p>
                         <p>Забронировано с {{ booking_status.date_from }} по {{ booking_status.date_to }}</p>
                         <p>Статус бронирования: <strong>{{ booking_status.get_status_display }}</strong></p>
+                    <div class="row">
                         <a href="{% url 'change_booking_status' booking_status.id %}" class="btn btn-primary">Подтвердить бронирование</a>
+                    </div>
                 </div>
             {% endfor %}
         </ul>

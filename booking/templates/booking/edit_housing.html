@@ -10,8 +10,14 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <div class="row">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
+            <br>
+            <div class="row">
+                <a href="{% url 'index' %}" class="btn btn-secondary">Отмена</a>
+            </div>
         </form>
     </div>
-    <a href="{% url 'index' %}" class="btn btn-secondary">Отмена</a>
+
 {% endblock %}

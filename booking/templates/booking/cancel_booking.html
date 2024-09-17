@@ -10,8 +10,12 @@
     <p>Вы бронировали с <strong>{{ booking.date_from }}</strong> по <strong>{{ booking.date_to }}</strong></p>
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Подтвердить отмену</button>
+            <div class="row">
+                <button type="submit" class="btn btn-danger">Подтвердить отмену</button>
+            </div>
         </form>
     </div>
-    <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+    <div class="row">
+        <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+    </div>
 {% endblock %}

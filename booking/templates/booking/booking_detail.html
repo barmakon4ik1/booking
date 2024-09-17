@@ -11,10 +11,14 @@
             <p><strong>Объект:</strong> {{ booking.housing.name }}</p>
             <p><strong>Дата бронирования:</strong> {{ booking.date_from }} - {{ booking.date_to }}</p>
             <p><strong>Фамилия бронировавшего</strong>{{ booking.user }}</p>
-            <a href="{% url 'change_booking_status' booking.id %}" class="btn btn-warning">Изменить статус</a>
+            <div class="row">
+                <a href="{% url 'change_booking_status' booking.id %}" class="btn btn-warning">Изменить статус</a>
+            </div>
         {% endif %}
     </div>
-    <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+    <div class="row">
+        <a href="{% url 'my_bookings' %}" class="btn btn-secondary mt-3">Назад к списку бронирований</a>
+    </div>
 
     <h2>Отзывы о {{ housing.name }}</h2>
     <div class="alert alert-warning mt-2">

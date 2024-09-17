@@ -16,17 +16,22 @@
                         {% if booking.status != 'CANCELED' %}
                             <form method="post" action="{% url 'cancel_booking' booking.id %}">
                                 {% csrf_token %}
+                            <div class="row">
                                 <button type="submit" class="btn btn-danger">Отменить бронирование</button>
+                            </div>
+                                <br>
+                            <div class="row">
                                 <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
-
+                            </div>
+                                <br>
+                            <div class="row">
                                     {% if booking.housing.id in housing_reviews %}
                                     <a href="{% url 'edit_review' booking.housing.id %}" class="btn btn-warning">Редактировать отзыв</a>
 
                                     {% else %}
                                     <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
                                     {% endif %}
-
-
+                            </div>
                             </form>
                             <br>
 

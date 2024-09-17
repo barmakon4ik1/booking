@@ -11,8 +11,9 @@
             {% csrf_token %}
 
              {{ form.as_p }}
-            
-            <button type="submit" class="btn btn-success">Добавить</button>
+            <div class="row">
+                <button type="submit" class="btn btn-success">Добавить</button>
+            </div>
             <span>{{ error }}</span>
         </form>
 

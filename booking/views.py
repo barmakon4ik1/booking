@@ -54,7 +54,7 @@ def housing_list(request):
     """
     if request.user.is_authenticated:
         # Получаем все объекты
-        housing = Housing.objects.all()
+        housing = Housing.objects.annotate(average_rating=Avg('reviews__rating'))
 
         # Применяем фильтры
         filter = HousingFilter(request.GET, queryset=housing)
@@ -68,6 +68,10 @@ def housing_list(request):
             filtered_housing = filtered_housing.order_by('price')
         elif sort_by == 'price_desc':
             filtered_housing = filtered_housing.order_by('-price')
+        elif sort_by == 'rating_asc':
+            filtered_housing = filtered_housing.order_by('average_rating')  # Сортировка по возрастанию рейтинга
+        elif sort_by == 'rating_desc':
+            filtered_housing = filtered_housing.order_by('-average_rating')  # Сортировка по убыванию рейтинга
         elif sort_by == 'date_newest':
             filtered_housing = filtered_housing.order_by('-created_at')
         elif sort_by == 'date_oldest':
@@ -76,6 +80,18 @@ def housing_list(request):
             filtered_housing = filtered_housing.order_by('rooms')
         elif sort_by == 'rooms_desc':
             filtered_housing = filtered_housing.order_by('-rooms')
+        elif sort_by == 'country_asc':
+            filtered_housing = filtered_housing.order_by('country')
+        elif sort_by == 'country_desc':
+            filtered_housing = filtered_housing.order_by('-country')
+        elif sort_by == 'city_asc':
+            filtered_housing = filtered_housing.order_by('city')
+        elif sort_by == 'city_desc':
+            filtered_housing = filtered_housing.order_by('-city')
+        elif sort_by == 'post_code_asc':
+            filtered_housing = filtered_housing.order_by('post_code')
+        elif sort_by == 'post_code_desc':
+            filtered_housing = filtered_housing.order_by('-post_code')
 
         # Передача данных в шаблон
         context = {

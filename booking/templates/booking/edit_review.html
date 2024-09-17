@@ -10,7 +10,9 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <div class="row">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
         </form>
     </div>
 {% endblock %}
