@@ -5,6 +5,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Housing(models.Model):
+    """
+    Модель объекта для бронирования
+    """
     class HousingType(models.TextChoices):
         APARTMENT = 'APARTMENT', 'Квартира'
         HOUSE = 'HOUSE', 'Дом'
@@ -51,6 +54,9 @@ class Housing(models.Model):
 
 
 class Booking(models.Model):
+    """
+    Модель бронирования объекта
+    """
     class BookingStatus(models.TextChoices):
         CONFIRMED = 'CONFIRMED', _('Confirmed')
         PENDING = 'PENDING', _('Pending confirmation')
