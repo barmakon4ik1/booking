@@ -1,0 +1,44 @@
+{% extends 'booking/base.html' %}
+
+{% block title %}
+    Подробная информация об объекте: {{ housing.name }}
+{% endblock %}
+
+{% block content %}
+    <h2>Объект: {{ housing.name }}</h2>
+
+    <div class="alert alert-warning mt-2">
+        <p><strong>Описание:</strong> {{ housing.description }}</p>
+        <p><strong>Адрес:</strong> {{ housing.street }} {{ housing.house_number }}, {{ housing.city }}, {{ housing.country }}</p>
+        <p><strong>Количество комнат:</strong> {{ housing.rooms }}</p>
+        <p><strong>Стоимость за сутки:</strong> {{ housing.price }} €</p>
+        <p><strong>Средняя оценка:</strong> {{ housing.get_average_rating }}</p>
+    </div>
+
+    <!-- Раздел отзывов -->
+    <div class="alert alert-warning mt-2">
+        <h3>Отзывы:</h3>
+        {% if reviews %}
+            <ul>
+                {% for review in reviews %}
+                    <li>
+                        <p><strong>{{ review.owner.username }}:</strong></p>
+                        <p>{{ review.content }}</p>
+                        <p><strong>Оценка:</strong> {{ review.rating }} / 5</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Отзывов пока нет. Будьте первым, кто оставит отзыв!</p>
+        {% endif %}
+    </div>
+
+    <!-- Кнопка для бронирования -->
+    <div class="row">
+    <a href="{% url 'create_booking' housing.id %}" class="btn btn-success mt-3">Забронировать</a>
+    </div>
+    <br>
+    <div class="row">
+    <a href="{% url 'housing_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+    </div>
+{% endblock %}

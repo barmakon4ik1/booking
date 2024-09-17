@@ -97,21 +97,22 @@
         {% endif %}
     </div>
 
-    <!-- Популярные объявления -->
-{#    <div class="alert alert-warning mt-2">#}
-{#        <h4>Популярные объявления:</h4>#}
-{#        {% if popular_housing %}#}
-{#            <ul>#}
-{#                {% for el in popular_housing %}#}
-{#                    <li>#}
-{#                        <a href="{% url 'housing_detail' el.id %}">{{ el.name }}</a> (Просмотров: {{ el.viewhistory_set.aggregate(total_views=Sum('view_count')).total_views }})#}
-{#                    </li>#}
-{#                {% endfor %}#}
-{#            </ul>#}
-{#        {% else %}#}
-{#            <p>Популярных объявлений пока нет.</p>#}
-{#        {% endif %}#}
-{#    </div>#}
+<!-- Популярные объявления -->
+    <div class="alert alert-warning mt-2">
+        <h4>Популярные объявления:</h4>
+        {% if popular_housing_list %}
+            <ul>
+                {% for housing, total_views in popular_housing_list %}
+                    <li>
+                        <a href="{% url 'housing_detail' housing.id %}">{{ housing.name }}</a>
+                        (Просмотров: {{ total_views }})
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Популярных объявлений пока нет.</p>
+        {% endif %}
+    </div>
 
     <!-- Список объектов жилья -->
     {% if housing %}

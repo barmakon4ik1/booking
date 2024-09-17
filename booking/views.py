@@ -18,7 +18,7 @@ from django.contrib import messages
 from .permissions import *
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, F, Count
+from django.db.models import Q, F, Count, Sum
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
@@ -126,12 +126,15 @@ def housing_list(request):
         ).order_by('-count')[:5]  # Выводим топ-5 популярных запросов
 
         # Получаем популярные объявления, отсортированные по количеству просмотров
-        popular_housing_ids = ViewHistory.objects.values('housing').annotate(
-            count=models.Count('view_count')
-        ).order_by('-count').values_list('housing', flat=True)
+        popular_housing_data = ViewHistory.objects.values('housing').annotate(
+            total_views=Sum('view_count')
+        ).order_by('-total_views')
 
-        # Добавляем популярные объявления в контекст
-        popular_housing = Housing.objects.filter(id__in=popular_housing_ids)
+        # Создаем список кортежей: (housing_object, total_views)
+        popular_housing_list = [
+            (Housing.objects.get(id=data['housing']), data['total_views'])
+            for data in popular_housing_data
+        ]
 
         # Передача данных в шаблон
         context = {
@@ -140,7 +143,7 @@ def housing_list(request):
             'sort_by': sort_by,  # Передаем значение сортировки обратно в шаблон
             'keyword': keyword,
             'popular_searches': popular_searches,  # Передаем популярные запросы в шаблон
-            'popular_housing': popular_housing,
+            'popular_housing_list': popular_housing_list, # Передаем список кортежей
         }
         return render(request, 'booking/housing_list.html', context)
     else:
@@ -663,6 +666,7 @@ def housing_detail(request, housing_id):
     Детальная страница объекта жилья
     """
     housing = get_object_or_404(Housing, pk=housing_id)
+    reviews = Review.objects.filter(housing=housing)
 
     # Проверка, есть ли у пользователя запись о просмотре данного объявления
     if request.user.is_authenticated:
@@ -677,5 +681,6 @@ def housing_detail(request, housing_id):
 
     context = {
         'housing': housing,
+        'reviews': reviews
     }
     return render(request, 'booking/housing_detail.html', context)
