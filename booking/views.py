@@ -159,6 +159,24 @@ class BookingViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
+class SearchViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows bookings to be viewed or edited.
+    """
+    queryset = SearchHistory.objects.all()
+    serializer_class = SearchHistorySerializer
+    permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
+
+
+class ViewHistoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows bookings to be viewed or edited.
+    """
+    queryset = ViewHistory.objects.all()
+    serializer_class = ViewHistorySerializer
+    permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
+
+
 class BookingDetailListCreateView(ListCreateAPIView):
     queryset = Booking.objects.all().order_by('id')
     permission_classes = (IsAuthenticated, IsOwnerOrAdmin)
@@ -257,7 +275,7 @@ def login_view(request):
                 user = authenticate(request, username=user.username, password=password)
                 if user is not None:
                     login(request, user)
-                    return redirect('/')  # Перенаправление на главную или нужную страницу
+                    return redirect('index')  # Перенаправление на главную или нужную страницу
                 else:
                     messages.error(request, 'Неверный пароль.')
             else:

@@ -46,5 +46,14 @@ class BookingDetailCreateUpdateSerializer(BookingSerializer):
         fields = '__all__'
 
 
+class SearchHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SearchHistory
+        fields = '__all__'
 
+
+class ViewHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ViewHistory
+        fields = '__all__'
 

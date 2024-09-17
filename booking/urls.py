@@ -9,6 +9,8 @@ router.register('housings', HousingViewSet, basename='housings')
 router.register('booking', BookingViewSet, basename='booking')
 router.register('reviews', ReviewViewSet, basename='reviews')
 router.register('users', UserViewSet, basename='users')
+router.register('views', ViewHistoryViewSet, basename='views')
+router.register('search', SearchViewSet, basename='search')
 
 urlpatterns = [
     path('housing_list/', housing_list, name='housing_list'),
