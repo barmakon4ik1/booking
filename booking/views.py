@@ -684,3 +684,6 @@ def housing_detail(request, housing_id):
         'reviews': reviews
     }
     return render(request, 'booking/housing_detail.html', context)
+
+
+
