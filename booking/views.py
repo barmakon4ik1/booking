@@ -44,8 +44,7 @@ def user_filter(request):
     else:
         # Фильтруем объекты по видимости и добавляем объекты, где пользователь является владельцем
         housing = Housing.objects.filter(
-            is_visible=True,
-            is_deleted=False
+            is_visible=True
         ).order_by('-id')
         return housing | Housing.objects.filter(owner=user)
 
@@ -56,7 +55,7 @@ def housing_list(request):
     """
     if request.user.is_authenticated:
         # Логика фильтрации объектов
-        housing = Housing.objects.filter(is_deleted=False).order_by('id')
+        housing = Housing.objects.filter(is_visible=True).order_by('id')
 
         # Получаем ключевое слово из GET-запроса
         keyword = request.GET.get('keyword', None)
@@ -424,7 +423,7 @@ def create_booking(request, housing_id):
         messages.error(request, 'Вы не можете забронировать свой собственный объект.')
         return redirect('message')  # Перенаправляем на страницу списка объектов
 
-    reviews = Review.objects.filter(housing=housing)
+    reviews = Review.objects.filter(housing=housing).order_by('owner_id')
 
     # Получение всех занятых дат для данного объекта
     bookings = Booking.objects.filter(housing=housing)
@@ -516,28 +515,6 @@ def my_bookings(request):
 
 
 @login_required
-def edit_review(request, review_id):
-    """
-    Редактирование отзыва
-    """
-    review = get_object_or_404(Review, pk=review_id, owner=request.user)
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ваш отзыв был успешно обновлен.')
-            return redirect('my_bookings')  # Возвращаем пользователя на страницу его бронирований
-    else:
-        form = ReviewForm(instance=review)
-
-    return render(request, 'booking/edit_review.html', {
-        'form': form,
-        'review': review
-    })
-
-
-@login_required
 def cancel_booking(request, booking_id):
     """
     Отмена бронирования
@@ -626,45 +603,6 @@ def my_confirmation(request):
 
 
 @login_required
-def create_review(request, housing_id):
-    """
-    Функция оставления отзыва
-    """
-    housing = get_object_or_404(Housing, pk=housing_id)
-
-    # Проверка, бронировал ли пользователь данный объект
-    has_booking = Booking.objects.filter(housing=housing, owner=request.user).exists()
-
-    if not has_booking:
-        messages.error(request, 'Вы не можете оставить отзыв на объект, который не бронировали.')
-        return redirect('index')
-
-    # Проверка, оставлял ли пользователь уже отзыв на данный объект
-    has_review = Review.objects.filter(housing=housing, owner=request.user).exists()
-
-    if has_review:
-        messages.error(request, 'Вы уже оставляли отзыв на этот объект.')
-        return redirect('my_bookings')
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.owner = request.user # Владелец отзыва - текущий пользователь
-            review.housing = housing
-            review.save()
-            messages.success(request, 'Ваш отзыв был успешно добавлен.')
-            return redirect('my_bookings')
-    else:
-        form = ReviewForm()
-
-    return render(request, 'booking/create_review.html', {
-        'form': form,
-        'housing': housing
-    })
-
-
-@login_required
 def housing_detail(request, housing_id):
     """
     Детальная страница объекта жилья
@@ -714,4 +652,53 @@ def delete_housing(request, housing_id):
     return redirect('index')
 
 
+logger = logging.getLogger(__name__)
+
+
+@login_required
+def create_review(request, housing_id):
+    """
+    Функция оставления отзыва
+    """
+    housing = get_object_or_404(Housing, pk=housing_id)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.owner = request.user  # Устанавливаем владельца
+            review.housing = housing  # Привязываем отзыв к жилью
+            review.save()
+            messages.success(request, 'Ваш отзыв успешно создан.')
+            return redirect('housing_detail', housing_id=housing_id)
+    else:
+        form = ReviewForm()
+
+    return render(request, 'booking/create_review.html', {
+        'form': form,
+        'housing': housing
+    })
+
+
+@login_required
+def edit_review(request, review_id):
+    """
+    Редактирование отзыва
+    """
+    logger.info(f"Review ID: {review_id}, User: {request.user}")
+
+    review = get_object_or_404(Review, pk=review_id, owner=request.user)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ваш отзыв был успешно обновлен.')
+            return redirect('my_bookings')  # Возвращаем пользователя на страницу его бронирований
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, 'booking/edit_review.html', {
+        'form': form,
+        'review': review
+    })
 
