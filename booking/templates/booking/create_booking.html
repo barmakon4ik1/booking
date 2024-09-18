@@ -20,20 +20,20 @@
             {% csrf_token %}
             {{ form.as_p }}  <!-- Форматируем поля с виджетами выбора даты -->
 
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+{#            {% if messages %}#}
+{#                <ul class="messages">#}
+{#                    {% for message in messages %}#}
+{#                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#            {% endif %}#}
              <div class="row">
                 <button type="submit" class="btn btn-primary">Забронировать</button>
              </div>
 
         </form>
      <div class="row">
-        <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+        <a href="{% url 'housing_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
      </div>
     </div>
 
@@ -47,7 +47,29 @@
                 <hr>
             {% endfor %}
         {% else %}
-            <p>Отзывов пока еще нет, вы можете оставить первый.</p>
+            <p>Отзывов пока еще нет, вы можете оставить первый. Для этого Вам нужно забронировать объект и дождаться подтверждения бронирования владельцем объекта.</p>
         {% endif %}
     </div>
+
+    <!-- Отображение занятых дат -->
+    <div class="alert alert-info mt-2">
+        <h3><strong>Занятые даты:</strong></h3>
+        <ul>
+            {% for date in occupied_dates %}
+                <li class="occupied-date">{{ date }}</li>
+            {% empty %}
+                <p>Нет занятых дат.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
 {% endblock %}
+
+<style>
+    .occupied-date {
+        background-color: #ffcccc; /* Цвет для занятых дат */
+        padding: 5px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+</style>
