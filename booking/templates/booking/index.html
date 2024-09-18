@@ -21,14 +21,15 @@
                 {% if user == el.owner or user.is_staff %}
                     <div class="row">
                         <a href="{% url 'edit_housing' el.id %}" class="btn btn-warning">Редактировать объект</a>
-                        <div action="{% url 'delete_housing' el.id %}" method="post" style="display:inline;">
-                        </div>
-                    <br>
-                    <div class="row">
-                    <button type="submit" class="btn btn-danger">Удалить объект</button>
                     </div>
+
+{#                    <br>#}
+{#                    <div class="row">#}
+{#                        <button type="submit" class="btn btn-danger">Удалить объект</button>#}
+{#                        <div action="{% url 'delete_housing' el.id %}" method="post" style="display:inline;"></div>#}
+{#                    </div>#}
                     {#                        {% csrf_token %}#}
-                    </form>
+
                 {% endif %}
             </div>
         {% endfor %}
@@ -38,4 +39,5 @@
             <p>Записей нет</p>
         </div>
     {% endif %}
+
 {% endblock %}

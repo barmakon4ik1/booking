@@ -1,7 +1,7 @@
 import logging
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from django.http import HttpResponseForbidden
+from django.template.defaulttags import now
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
@@ -29,6 +29,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.utils.dateformat import format
 
 
 def user_filter(request):
@@ -43,7 +44,8 @@ def user_filter(request):
     else:
         # Фильтруем объекты по видимости и добавляем объекты, где пользователь является владельцем
         housing = Housing.objects.filter(
-            is_visible=True
+            is_visible=True,
+            is_deleted=False
         ).order_by('-id')
         return housing | Housing.objects.filter(owner=user)
 
@@ -54,7 +56,7 @@ def housing_list(request):
     """
     if request.user.is_authenticated:
         # Логика фильтрации объектов
-        housing = Housing.objects.all()
+        housing = Housing.objects.filter(is_deleted=False).order_by('id')
 
         # Получаем ключевое слово из GET-запроса
         keyword = request.GET.get('keyword', None)
@@ -315,7 +317,7 @@ def index(request):
         logger = logging.getLogger(__name__)
         logger.error(f"Error occurred: {e}")
         # Перенаправление на страницу с авторизацией
-        return render(request, 'booking/error.html', {'error_message': str(e)})
+        return render(request, 'booking/message.html', {'error_message': str(e)})
 
 
 def about(request):
@@ -416,7 +418,25 @@ def create_booking(request, housing_id):
     Создание бронирования
     """
     housing = get_object_or_404(Housing, pk=housing_id)
+
+    # Проверка, является ли текущий пользователь владельцем объекта
+    if request.user == housing.owner:
+        messages.error(request, 'Вы не можете забронировать свой собственный объект.')
+        return redirect('message')  # Перенаправляем на страницу списка объектов
+
     reviews = Review.objects.filter(housing=housing)
+
+    # Получение всех занятых дат для данного объекта
+    bookings = Booking.objects.filter(housing=housing)
+    occupied_dates = []
+    for booking in bookings:
+        start_date = booking.date_from
+        end_date = booking.date_to
+        # Создаем список всех дат в диапазоне бронирования
+        current_date = start_date
+        while current_date <= end_date:
+            occupied_dates.append(format(current_date, 'Y-m-d'))
+            current_date += timedelta(days=1)
 
     if request.method == 'POST':
         form = BookingForm(request.POST)
@@ -430,7 +450,7 @@ def create_booking(request, housing_id):
             date_to = form.cleaned_data['date_to']
 
             # Проверка на даты в прошлом
-            if date_from < datetime.now().date() or date_to < datetime.now().date():
+            if date_from < now().date() or date_to < now().date():
                 messages.error(request, 'Выбранные даты не могут быть в прошлом. Пожалуйста, выберите другие даты.')
                 return render(request, 'booking/create_booking.html', {
                     'form': form,
@@ -471,25 +491,9 @@ def create_booking(request, housing_id):
     return render(request, 'booking/create_booking.html', {
         'form': form,
         'housing': housing,
-        'reviews': reviews
+        'reviews': reviews,
+        'occupied_dates': occupied_dates,
     })
-
-
-@login_required
-def delete_housing(request, housing_id):
-    """
-    Удаление объекта недвижимости.
-    Доступно только владельцам объекта или администраторам.
-    """
-    housing = get_object_or_404(Housing, pk=housing_id)
-
-    if request.user == housing.owner or request.user.is_staff:
-        housing.delete()
-        messages.success(request, 'Объект был успешно удален.')
-    else:
-        messages.error(request, 'У вас нет прав для удаления этого объекта.')
-
-    return redirect('index')
 
 
 @login_required
@@ -684,6 +688,30 @@ def housing_detail(request, housing_id):
         'reviews': reviews
     }
     return render(request, 'booking/housing_detail.html', context)
+
+
+def message(request):
+    """
+    Форма вывода сообщения
+    """
+    return render(request, 'booking/message.html')
+
+
+@login_required
+def delete_housing(request, housing_id):
+    """
+    Удаление объекта владельцем (не сохраняется в базе)
+    """
+    housing = get_object_or_404(Housing, id=housing_id)
+
+    # Проверяем, что пользователь является владельцем объекта
+    if request.user == housing.owner or request.user.is_staff:
+        housing.delete()
+        messages.success(request, 'Объект был успешно удален.')
+    else:
+        messages.error(request, 'У вас нет прав для удаления этого объекта.')
+
+    return redirect('index')
 
 
 

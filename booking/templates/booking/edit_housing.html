@@ -18,6 +18,13 @@
                 <a href="{% url 'index' %}" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
-    </div>
 
+        <!-- Кнопка для удаления объекта (делает объект невидимым) -->
+        <form method="post" action="{% url 'delete_housing' housing.id %}">
+            {% csrf_token %}
+            <div class="row">
+                <button type="submit" class="btn btn-danger mt-3">Удалить объект</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

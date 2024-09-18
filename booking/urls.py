@@ -16,6 +16,8 @@ urlpatterns = [
     path('housing_list/', housing_list, name='housing_list'),
     path('housing/edit/<int:housing_id>/', edit_housing, name='edit_housing'),
     path('housing/delete/<int:housing_id>/', delete_housing, name='delete_housing'),
+    path('message/', message, name='message'),
+    path('delete/<int:housing_id>/', delete_housing, name='delete_housing'),
 
     path('booking/create/<int:housing_id>/', create_booking, name='create_booking'),
     path('my_bookings/', my_bookings, name='my_bookings'),
