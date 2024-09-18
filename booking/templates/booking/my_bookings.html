@@ -6,48 +6,60 @@
 
 {% block content %}
     <h2>Ваши бронирования</h2>
-        {% if bookings %}
-            <ul class="list-group">
-                {% for booking in bookings %}
-                    <div class="alert alert-warning mt-2">
-                        <p><strong>Объект:</strong> {{ booking.housing.name }}</p>
-                        <p><strong>Дата бронирования:</strong> {{ booking.date_from }} - {{ booking.date_to }}</p>
-                        <p><strong>Статус:</strong> {{ booking.get_status_display }}</p>
-                        {% if booking.status != 'CANCELED' %}
-                            <form method="post" action="{% url 'cancel_booking' booking.id %}">
-                                {% csrf_token %}
-                            <div class="row">
-                                <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
-                            </div>
-                                <br>
+    {% if bookings %}
+        <ul class="list-group">
+            {% for booking in bookings %}
+                <div class="alert alert-warning mt-2">
+                    <p><strong>Объект:</strong> {{ booking.housing.name }}</p>
+                    <p><strong>Дата бронирования:</strong> {{ booking.date_from }} - {{ booking.date_to }}</p>
+                    <p><strong>Статус:</strong> {{ booking.get_status_display }}</p>
+
+                    {% if booking.status != 'CANCELED' %}
+                        <form method="post" action="{% url 'cancel_booking' booking.id %}">
+                            {% csrf_token %}
+
+                            <!-- Проверка, если статус бронирования не 'Confirmed' для редактирования -->
+                            {% if booking.status != 'CONFIRMED' %}
+                                <div class="row">
+                                    <a href="{% url 'edit_booking' booking.id %}" class="btn btn-warning">Редактировать бронирование</a>
+                                </div>
+                            {% else %}
+                                <p><strong>Редактирование подтвержденного бронирования невозможно!</strong></p>
+                            {% endif %}
+
+                            <br>
+
+                            <!-- Проверка, если статус не 'Confirmed' для отмены бронирования -->
+                            {% if booking.status != 'CONFIRMED' %}
+                                <div class="row">
+                                    <button type="submit" class="btn btn-danger">Отменить бронирование</button>
+                                </div>
+                            {% else %}
+                                <p><strong>Отменить подтвержденное бронирование невозможно!</strong></p>
+                            {% endif %}
+                            <br>
+
+                            <!-- Проверка, если статус бронирования не 'Unconfirmed' для отзыва -->
+                            {% if booking.status != 'UNCONFIRMED' %}
                                 <div class="row">
                                     {% if booking.housing.id in housing_reviews %}
                                         <a href="{% url 'edit_review' booking.housing.id %}" class="btn btn-warning">Редактировать отзыв</a>
-
                                     {% else %}
                                         <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
                                     {% endif %}
                                 </div>
-                                <br>
-                                <div class="row">
-                                    <button type="submit" class="btn btn-danger">Отменить бронирование</button>
-                                </div>
-                            </form>
-                            <br>
-
-
-
-
-                        {% else %}
-                            <p>Это бронирование отменено</p>
-                        {% endif %}
-
-                    </div>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="alert alert-warning mt-2">
-                <p>У вас нет бронирований.</p>
-            </div>
-        {% endif %}
+                            {% endif %}
+                        </form>
+                        <br>
+                    {% else %}
+                        <p><strong>Это бронирование отменено</strong></p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-warning mt-2">
+            <p><strong>У вас нет бронирований.</strong></p>
+        </div>
+    {% endif %}
 {% endblock %}
