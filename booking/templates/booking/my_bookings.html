@@ -39,11 +39,16 @@
                             {% endif %}
                             <br>
 
-                            <!-- Проверка, если статус бронирования не 'Unconfirmed' для отзыва -->
+                            <!-- Проверка на наличие отзыва, если статус бронирования не 'Unconfirmed' -->
                             {% if booking.status != 'UNCONFIRMED' %}
                                 <div class="row">
                                     {% if booking.housing.id in housing_reviews %}
-                                        <a href="{% url 'edit_review' booking.housing.id %}" class="btn btn-warning">Редактировать отзыв</a>
+                                        <!-- Находим review_id для данного объекта жилья -->
+                                        {% for review in housing_reviews %}
+                                            {% if review.housing.id == booking.housing.id %}
+                                                <a href="{% url 'edit_review' review.id %}" class="btn btn-warning">Редактировать отзыв</a>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% else %}
                                         <a href="{% url 'create_review' booking.housing.id %}" class="btn btn-success">Оставить отзыв</a>
                                     {% endif %}

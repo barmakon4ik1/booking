@@ -7,7 +7,7 @@
 {% block content %}
     <h2>Редактирование отзыва для {{ review.housing.name }}</h2>
     <div class="alert alert-warning mt-2">
-        <form method="post">
+        <form method="post" action="{% url 'edit_review' review.id %}">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="row">
@@ -16,3 +16,4 @@
         </form>
     </div>
 {% endblock %}
+

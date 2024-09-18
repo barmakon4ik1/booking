@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from django.http import HttpResponseForbidden
-from django.template.defaulttags import now
+from django.utils.timezone import now
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets
@@ -258,6 +258,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
+    def perform_create(self, serializer):
+        """
+        Устанавливает текущего пользователя как владельца
+        """
+        serializer.save(owner=self.request.user)
 
 
 def login_view(request):
@@ -686,7 +692,13 @@ def edit_review(request, review_id):
     """
     logger.info(f"Review ID: {review_id}, User: {request.user}")
 
-    review = get_object_or_404(Review, pk=review_id, owner=request.user)
+    # Проверка наличия отзыва для текущего пользователя
+    try:
+        review = Review.objects.get(pk=review_id, owner=request.user)
+    except Review.DoesNotExist:
+        logger.error(f"No review found for user {request.user} with review_id {review_id}")
+        messages.error(request, "Такого отзыва не существует или он вам не принадлежит.")
+        return redirect('my_bookings')  # Перенаправление на страницу с бронированиями
 
     if request.method == 'POST':
         form = ReviewForm(request.POST, instance=review)
