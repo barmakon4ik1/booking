@@ -317,12 +317,12 @@ def index(request):
             'housing': user_filter(request)
         })
     except Exception as e:
-        # Логирование ошибки для отладки
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error occurred: {e}")
-        # Перенаправление на страницу с авторизацией
-        return render(request, 'booking/message.html', {'error_message': str(e)})
+        # # Логирование ошибки для отладки
+        # import logging
+        # logger = logging.getLogger(__name__)
+        # logger.error(f"Error occurred: {e}")
+        # # Перенаправление на страницу с авторизацией
+        return render(request, 'booking/about.html')
 
 
 def about(request):
@@ -636,9 +636,9 @@ def housing_detail(request, housing_id):
 
 def message(request):
     """
-    Форма вывода сообщения
+    Форма вывода сообщения о невозможности бронирования своего объекта
     """
-    return render(request, 'booking/message.html')
+    return render(request, 'booking/message_owner.html')
 
 
 @login_required
