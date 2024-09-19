@@ -12,17 +12,17 @@
         <strong>
           <a class="link-body-emphasis text-decoration-none" href="{% url 'index' %}"><h3>AT-Booking</h3></a>
                {% if user.is_authenticated %}
-                   <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'logout' %}">User: {{ user.username }} (Logout) </a>
+                   <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'logout' %}">Пользователь: {{ user.username }} (Logout) </a>
                {% else %}
-                   <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'login' %}">Login</a>
+                   <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'login' %}">Войти</a>
                {% endif %}
-               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'housing_list' %}">Booking</a>
-               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'create' %}">Create</a>
-               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'my_bookings' %}">My bookings</a>
-                <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'my_confirmation' %}">My confirmations</a>
-                <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'about' %}">About</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/admin/">Admin</a>
-               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/api/">API</a>
+               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'housing_list' %}">Бронировать</a>
+               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'create' %}">Создать</a>
+               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'my_bookings' %}">Мои бронирования</a>
+                <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'my_confirmation' %}">Подтверждения</a>
+                <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="{% url 'about' %}">О программе</a>
+{#            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/admin/">Admin</a>#}
+{#               <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/api/">API</a>#}
         </strong>
    </div>
 </div>

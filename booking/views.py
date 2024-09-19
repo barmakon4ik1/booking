@@ -49,106 +49,106 @@ def user_filter(request):
         return housing | Housing.objects.filter(owner=user)
 
 
+@login_required
 def housing_list(request):
     """
     Список объектов жилья с возможностью сортировки и фильтрации
     """
-    if request.user.is_authenticated:
-        # Логика фильтрации объектов
-        housing = Housing.objects.filter(is_visible=True).order_by('id')
 
-        # Получаем ключевое слово из GET-запроса
-        keyword = request.GET.get('keyword', None)
+    # Логика фильтрации объектов
+    housing = Housing.objects.filter(is_visible=True).order_by('-created_at')
 
-        if keyword:
-            # Фильтруем объекты по ключевому слову
-            housing = housing.filter(Q(description__icontains=keyword) | Q(name__icontains=keyword))
+    # Получаем ключевое слово из GET-запроса
+    keyword = request.GET.get('keyword', None)
 
-            # Сохраняем запрос в историю поиска
-            if request.user.is_authenticated:
-                search_entry, created = SearchHistory.objects.get_or_create(
-                    user=request.user, keyword=keyword
-                )
-                if not created:
-                    # Если запрос уже существует, увеличиваем счетчик
-                    search_entry.search_count = F('search_count') + 1
-                    search_entry.save()
+    if keyword:
+        # Фильтруем объекты по ключевому слову
+        housing = housing.filter(Q(description__icontains=keyword) | Q(name__icontains=keyword))
 
-        # Аннотируем количество отзывов и средний рейтинг
-        housing = Housing.objects.annotate(
-            review_count=Count('reviews'),  # Подсчет количества отзывов
-            average_rating=Avg('reviews__rating')
-        )
+        # Сохраняем запрос в историю поиска
+        if request.user.is_authenticated:
+            search_entry, created = SearchHistory.objects.get_or_create(
+                user=request.user, keyword=keyword
+            )
+            if not created:
+                # Если запрос уже существует, увеличиваем счетчик
+                search_entry.search_count = F('search_count') + 1
+                search_entry.save()
 
-        # Применяем фильтры
-        filter = HousingFilter(request.GET, queryset=housing)
-        filtered_housing = filter.qs
+    # Аннотируем количество отзывов и средний рейтинг
+    housing = housing.annotate(
+        review_count=Count('reviews'),  # Подсчет количества отзывов
+        average_rating=Avg('reviews__rating')
+    )
 
-        # Получаем параметр сортировки
-        sort_by = request.GET.get('sort_by')
+    # Применяем фильтры
+    filter = HousingFilter(request.GET, queryset=housing)
+    filtered_housing = filter.qs
 
-        # Применение сортировки после фильтрации
-        if sort_by == 'price_asc':
-            filtered_housing = filtered_housing.order_by('price')
-        elif sort_by == 'price_desc':
-            filtered_housing = filtered_housing.order_by('-price')
-        elif sort_by == 'rating_asc':
-            filtered_housing = filtered_housing.order_by('average_rating')  # Сортировка по возрастанию рейтинга
-        elif sort_by == 'rating_desc':
-            filtered_housing = filtered_housing.order_by('-average_rating')  # Сортировка по убыванию рейтинга
-        elif sort_by == 'date_newest':
-            filtered_housing = filtered_housing.order_by('-created_at')
-        elif sort_by == 'date_oldest':
-            filtered_housing = filtered_housing.order_by('created_at')
-        elif sort_by == 'rooms_asc':
-            filtered_housing = filtered_housing.order_by('rooms')
-        elif sort_by == 'rooms_desc':
-            filtered_housing = filtered_housing.order_by('-rooms')
-        elif sort_by == 'country_asc':
-            filtered_housing = filtered_housing.order_by('country')
-        elif sort_by == 'country_desc':
-            filtered_housing = filtered_housing.order_by('-country')
-        elif sort_by == 'city_asc':
-            filtered_housing = filtered_housing.order_by('city')
-        elif sort_by == 'city_desc':
-            filtered_housing = filtered_housing.order_by('-city')
-        elif sort_by == 'post_code_asc':
-            filtered_housing = filtered_housing.order_by('post_code')
-        elif sort_by == 'post_code_desc':
-            filtered_housing = filtered_housing.order_by('-post_code')
-        elif sort_by == 'views_desc':
-            filtered_housing = filtered_housing.order_by('-views')  # Сортировка по просмотрам
-        elif sort_by == 'review_count_desc':
-            filtered_housing = filtered_housing.order_by('-review_count')  # Сортировка по количеству отзывов
+    # Получаем параметр сортировки
+    sort_by = request.GET.get('sort_by')
 
-        # Получение популярных запросов (по количеству запросов, сортировка по `search_count`)
-        popular_searches = SearchHistory.objects.values('keyword').annotate(
-            count=models.Count('keyword')
-        ).order_by('-count')[:5]  # Выводим топ-5 популярных запросов
+    # Применение сортировки после фильтрации
+    if sort_by == 'price_asc':
+        filtered_housing = filtered_housing.order_by('price')
+    elif sort_by == 'price_desc':
+        filtered_housing = filtered_housing.order_by('-price')
+    elif sort_by == 'rating_asc':
+        filtered_housing = filtered_housing.order_by('average_rating')  # Сортировка по возрастанию рейтинга
+    elif sort_by == 'rating_desc':
+        filtered_housing = filtered_housing.order_by('-average_rating')  # Сортировка по убыванию рейтинга
+    elif sort_by == 'date_newest':
+        filtered_housing = filtered_housing.order_by('-created_at')
+    elif sort_by == 'date_oldest':
+        filtered_housing = filtered_housing.order_by('created_at')
+    elif sort_by == 'rooms_asc':
+        filtered_housing = filtered_housing.order_by('rooms')
+    elif sort_by == 'rooms_desc':
+        filtered_housing = filtered_housing.order_by('-rooms')
+    elif sort_by == 'country_asc':
+        filtered_housing = filtered_housing.order_by('country')
+    elif sort_by == 'country_desc':
+        filtered_housing = filtered_housing.order_by('-country')
+    elif sort_by == 'city_asc':
+        filtered_housing = filtered_housing.order_by('city')
+    elif sort_by == 'city_desc':
+        filtered_housing = filtered_housing.order_by('-city')
+    elif sort_by == 'post_code_asc':
+        filtered_housing = filtered_housing.order_by('post_code')
+    elif sort_by == 'post_code_desc':
+        filtered_housing = filtered_housing.order_by('-post_code')
+    elif sort_by == 'views_desc':
+        filtered_housing = filtered_housing.order_by('-views')  # Сортировка по просмотрам
+    elif sort_by == 'review_count_desc':
+        filtered_housing = filtered_housing.order_by('-review_count')  # Сортировка по количеству отзывов
 
-        # Получаем популярные объявления, отсортированные по количеству просмотров
-        popular_housing_data = ViewHistory.objects.values('housing').annotate(
-            total_views=Sum('view_count')
-        ).order_by('-total_views')
+    # Получение популярных запросов (по количеству запросов, сортировка по `search_count`)
+    popular_searches = SearchHistory.objects.values('keyword').annotate(
+        count=models.Count('keyword')
+    ).order_by('-count')[:5]  # Выводим топ-5 популярных запросов
 
-        # Создаем список кортежей: (housing_object, total_views)
-        popular_housing_list = [
-            (Housing.objects.get(id=data['housing']), data['total_views'])
-            for data in popular_housing_data
-        ]
+    # Получаем популярные объявления, отсортированные по количеству просмотров
+    popular_housing_data = ViewHistory.objects.values('housing').annotate(
+        total_views=Sum('view_count')
+    ).order_by('-total_views')
 
-        # Передача данных в шаблон
-        context = {
-            'housing': filtered_housing,
-            'filter': filter,
-            'sort_by': sort_by,  # Передаем значение сортировки обратно в шаблон
-            'keyword': keyword,
-            'popular_searches': popular_searches,  # Передаем популярные запросы в шаблон
-            'popular_housing_list': popular_housing_list, # Передаем список кортежей
-        }
-        return render(request, 'booking/housing_list.html', context)
-    else:
-        return redirect('login')
+    # Создаем список кортежей: (housing_object, total_views)
+    popular_housing_list = [
+        (Housing.objects.get(id=data['housing']), data['total_views'])
+        for data in popular_housing_data
+    ]
+
+    # Передача данных в шаблон
+    context = {
+        'housing': filtered_housing,
+        'filter': filter,
+        'sort_by': sort_by,  # Передаем значение сортировки обратно в шаблон
+        'keyword': keyword,
+        'popular_searches': popular_searches,  # Передаем популярные запросы в шаблон
+        'popular_housing_list': popular_housing_list,  # Передаем список кортежей
+    }
+    return render(request, 'booking/housing_list.html', context)
+
 
 
 class BookingViewSet(viewsets.ModelViewSet):

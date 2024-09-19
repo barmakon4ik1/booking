@@ -7,11 +7,20 @@
 {% block content %}
     <h1>Описание программы</h1>
     <div class="alert alert-danger mt-3">
-        <h1 class="text-danger">Для работы с сайтом необходима авторизация!</h1>
+        <h3>Для работы с системой необходимо войти в неё</h3><br>
 
-              <div class="row">
-                <a href="{% url 'login' %}" class="btn btn-primary">Войти в систему</a>
-            </div>
+        {% if user.is_authenticated %}
+            <h4><strong>Добро пожаловать, {{ user.first_name }} {{ user.last_name }}!</strong></h4>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="row">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Войти в систему</a>
+                </div>
+            </form>
+
+        {% endif %}
 
     </div>
     <div class="alert alert-warning mt-2">
